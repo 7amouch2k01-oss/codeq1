@@ -1,24 +1,95 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { BookOpen, Terminal, Trophy, Star, Flame, Shield, Crown } from "lucide-react";
+import { Shell } from "@/components/site";
+import { courses, leaders } from "@/lib/data";
+import map from "@/assets/quest-map.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Questbound — Level up your code, one quest at a time" },
+      { name: "description", content: "Learn Python, HTML, C and C++ through interactive coding quests, daily battles and leaderboards." },
+      { property: "og:title", content: "Questbound Code Academy" },
+      { property: "og:description", content: "Learn to code through quests, battles and real projects." },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <Shell>
+      <section className="grid items-center gap-10 lg:grid-cols-2">
+        <div>
+          <p className="eyebrow text-primary">Learn / Practice / Level up</p>
+          <h1 className="mt-4 text-5xl font-bold leading-tight md:text-6xl">
+            Level up your code, <span className="text-primary">one quest</span> at a time.
+          </h1>
+          <p className="mt-5 max-w-lg text-lg text-muted-foreground">
+            Questbound makes coding fun with interactive quests, real projects, and a community that builds together.
+          </p>
+          <div className="mt-8 flex gap-3">
+            <Link to="/courses" className="rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground glow">Start your quest →</Link>
+            <Link to="/battle" className="rounded-xl border border-border px-6 py-3 font-semibold">Today's battle</Link>
+          </div>
+        </div>
+        <img src={map} alt="Quest map with a glowing path to a castle" width={1280} height={896} className="rounded-2xl glow" />
+      </section>
+
+      <section className="panel mt-14 grid gap-4 p-6 sm:grid-cols-4">
+        {courses.map((c) => (
+          <Link key={c.id} to="/courses" className="rounded-lg p-2 hover:bg-secondary">
+            <div className={`font-display text-lg font-bold ${c.color}`}>{c.name}</div>
+            <div className="text-sm text-muted-foreground">{c.blurb.split(",")[0]}</div>
+          </Link>
+        ))}
+      </section>
+
+      <section className="mt-14 grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <h2 className="text-3xl font-bold">How it works</h2>
+          <p className="text-muted-foreground">A simple path to real progress.</p>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              { i: BookOpen, t: "Learn", d: "Follow bite-sized lessons designed like quests.", c: "text-primary" },
+              { i: Terminal, t: "Code", d: "Solve challenges and build real projects.", c: "text-sky" },
+              { i: Trophy, t: "Conquer", d: "Earn XP, unlock badges, and climb the leaderboard.", c: "text-gold" },
+            ].map(({ i: I, t, d, c }) => (
+              <div key={t} className="panel p-5">
+                <I className={`h-8 w-8 ${c}`} />
+                <h3 className="mt-3 text-xl font-bold">{t}</h3>
+                <p className="text-sm text-muted-foreground">{d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="panel mt-4 grid gap-4 p-6 md:grid-cols-3">
+            {[
+              { i: Star, v: "250K+", l: "XP earned by learners", c: "text-gold" },
+              { i: Flame, v: "32", l: "day average streak", c: "text-ember" },
+              { i: Shield, v: "18K+", l: "badges unlocked", c: "text-sky" },
+            ].map(({ i: I, v, l, c }) => (
+              <div key={l} className="flex items-center gap-3">
+                <I className={`h-8 w-8 ${c}`} />
+                <div><div className={`font-display text-3xl font-bold ${c}`}>{v}</div><div className="text-sm text-muted-foreground">{l}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="panel p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-xl font-bold"><Crown className="h-5 w-5 text-gold" />Leaderboard</h3>
+            <Link to="/leaderboard" className="text-sm text-primary">View all →</Link>
+          </div>
+          <ol className="mt-4 space-y-3">
+            {leaders.slice(0, 5).map((p, i) => (
+              <li key={p.name} className="flex items-center justify-between">
+                <span><span className="mr-3 text-muted-foreground">{i + 1}</span>{p.name}</span>
+                <span className="font-semibold text-gold">{p.xp.toLocaleString()} XP</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    </Shell>
   );
 }
