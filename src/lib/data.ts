@@ -1,8 +1,14 @@
+import python from "@/assets/banner-python.jpg";
+import html from "@/assets/banner-html.jpg";
+import c from "@/assets/banner-c.jpg";
+import cpp from "@/assets/banner-cpp.jpg";
+const banners = { python, html, c, cpp };
+
 export const courses = [
-  { id: "python", name: "Python", blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.", progress: 2, popular: true, color: "text-gold" },
-  { id: "html", name: "HTML", blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.", progress: 1, color: "text-ember" },
-  { id: "c", name: "C", blurb: "Understand how computers work and build powerful, high-performance programs.", progress: 1, color: "text-sky" },
-  { id: "cpp", name: "C++", blurb: "Take your skills further with modern C++. Build games, engines, and systems.", progress: 1, color: "text-sky" },
+  { id: "python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", banner: banners.python, name: "Python", blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.", progress: 2, popular: true, color: "text-gold" },
+  { id: "html", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg", banner: banners.html, name: "HTML", blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.", progress: 1, color: "text-ember" },
+  { id: "c", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg", banner: banners.c, name: "C", blurb: "Understand how computers work and build powerful, high-performance programs.", progress: 1, color: "text-sky" },
+  { id: "cpp", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg", banner: banners.cpp, name: "C++", blurb: "Take your skills further with modern C++. Build games, engines, and systems.", progress: 1, color: "text-sky" },
 ];
 export const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
