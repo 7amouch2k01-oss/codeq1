@@ -24,6 +24,7 @@ function Board() {
         <div className="mt-8 grid grid-cols-3 items-end gap-4 text-center">
           {podium.map((p, i) => (
             <div key={p.name}>
+              <img src={p.avatar} alt={p.name} width={96} height={96} className={`mx-auto mb-2 rounded-xl border-2 ${i === 1 ? "h-24 w-24 border-gold" : "h-20 w-20 border-border"}`} />
               <div className="font-bold">{p.name}</div>
               <div className="font-bold text-gold">{p.xp.toLocaleString()} XP</div>
               <div className={`mt-2 rounded-t-lg bg-secondary font-display text-3xl font-bold ${i === 1 ? "h-32 text-gold" : i === 0 ? "h-24" : "h-16 text-ember"} flex items-center justify-center`}>{[2, 1, 3][i]}</div>
@@ -35,7 +36,7 @@ function Board() {
           <tbody>
             {leaders.slice(3).map((p, i) => (
               <tr key={p.name} className={p.me ? "outline outline-1 outline-primary text-primary" : "border-t border-border"}>
-                <td className="p-3">{i + 4}</td><td>{p.name}</td><td className="text-muted-foreground">{p.title}</td><td className="pr-3 text-right font-semibold text-gold">{p.xp.toLocaleString()} XP</td>
+                <td className="p-3">{i + 4}</td><td><span className="flex items-center gap-3"><img src={p.avatar} alt="" width={36} height={36} loading="lazy" className="h-9 w-9 rounded-md border border-border" />{p.name}</span></td><td className="text-muted-foreground">{p.title}</td><td className="pr-3 text-right font-semibold text-gold">{p.xp.toLocaleString()} XP</td>
               </tr>
             ))}
           </tbody>

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Swords, Clock, Play } from "lucide-react";
 import { Shell } from "@/components/site";
+import { avatars } from "@/lib/data";
 
 export const Route = createFileRoute("/battle")({
   head: () => ({
@@ -42,9 +43,9 @@ function Battle() {
           <div className="rounded-xl bg-code px-4 py-2"><span className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-4 w-4" />Ends in</span><span className="font-mono text-2xl font-bold text-primary">{left}</span></div>
         </div>
         <div className="my-6 flex items-center justify-center gap-10 text-center">
-          <div><div className="font-bold">PixelRogue</div><div className="text-sm text-muted-foreground">Level 12</div></div>
+          <div><img src={avatars.rogue} alt="PixelRogue" width={96} height={96} className="mx-auto mb-2 h-24 w-24 rounded-xl border-2 border-ember" /><div className="font-bold">PixelRogue</div><div className="text-sm text-muted-foreground">Level 12</div></div>
           <span className="font-display text-4xl font-bold text-ember">VS</span>
-          <div><div className="font-bold text-primary">You</div><div className="text-sm text-muted-foreground">Level 12</div></div>
+          <div><img src={avatars.mage} alt="You" width={96} height={96} className="mx-auto mb-2 h-24 w-24 rounded-xl border-2 border-primary" /><div className="font-bold text-primary">You</div><div className="text-sm text-muted-foreground">Level 12</div></div>
         </div>
         <div className="rounded-xl border border-border p-5">
           <div className="flex justify-between"><div><p className="text-sm text-muted-foreground">Today's Challenge</p><h2 className="text-2xl font-bold">Reverse a string</h2></div><span className="h-fit rounded-md border border-primary px-3 py-1 text-sm text-primary">Easy</span></div>
