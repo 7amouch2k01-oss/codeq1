@@ -39,7 +39,7 @@ function Exam() {
     if (!user) return;
     const sc = Math.round((ans.filter((a, k) => a === qs[k]!.a).length / qs.length) * 100);
     const { error } = await supabase.from("exam_results").insert({ user_id: user.id, exam_id: "python-beginner", score: sc, passed: sc >= 80 });
-    if (error) return toast.error("Couldn't save your result.");
+    if (error) { toast.error("Couldn't save your result."); return; }
     if (sc >= 80) await supabase.rpc("award_xp", { _amount: 50 });
     toast.success("Exam result saved.");
     refresh();
