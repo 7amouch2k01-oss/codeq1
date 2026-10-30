@@ -29,8 +29,9 @@ function Lesson() {
   };
   const submit = () => {
     const r = run();
-    setDone(r === Array.from({ length: 10 }, (_, i) => i + 1).join("\n"));
-    if (r !== null && !done) setErr(r === "1\n2\n3\n4\n5\n6\n7\n8\n9\n10" ? "" : "Not quite — print 1 through 10, each on its own line.");
+    const ok = r === "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
+    setDone(ok);
+    if (r !== null && !ok) setErr("Not quite — print 1 through 10, each on its own line.");
   };
   return (
     <Shell>
