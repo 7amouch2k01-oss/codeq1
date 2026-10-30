@@ -62,7 +62,7 @@ function Courses() {
             </div>
             <div className="mt-4 flex justify-between text-sm"><span>Progress: {c.progress} / 4 levels</span><span>{c.progress * 25}%</span></div>
             <div className="mt-2 h-2 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: `${c.progress * 25}%` }} /></div>
-            <Link to="/lesson" className="mt-5 rounded-xl bg-primary py-3 text-center font-semibold text-primary-foreground">Continue →</Link>
+            <Link to="/map" className="mt-5 rounded-xl bg-primary py-3 text-center font-semibold text-primary-foreground">Continue →</Link>
             </div>
           </div>
         ))}

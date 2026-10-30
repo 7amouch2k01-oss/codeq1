@@ -10,15 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BattleRouteImport } from './routes/battle'
+import { Route as CertificateRouteImport } from './routes/certificate'
 import { Route as CoursesRouteImport } from './routes/courses'
+import { Route as ExamRouteImport } from './routes/exam'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LessonRouteImport } from './routes/lesson'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as ProfileRouteImport } from './routes/profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BattleRoute = BattleRouteImport.update({
@@ -26,9 +36,19 @@ const BattleRoute = BattleRouteImport.update({
   path: '/battle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CertificateRoute = CertificateRouteImport.update({
+  id: '/certificate',
+  path: '/certificate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoursesRoute = CoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamRoute = ExamRouteImport.update({
+  id: '/exam',
+  path: '/exam',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -41,60 +61,116 @@ const LessonRoute = LessonRouteImport.update({
   path: '/lesson',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/battle': typeof BattleRoute
+  '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
+  '/exam': typeof ExamRoute
   '/leaderboard': typeof LeaderboardRoute
   '/lesson': typeof LessonRoute
+  '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/battle': typeof BattleRoute
+  '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
+  '/exam': typeof ExamRoute
   '/leaderboard': typeof LeaderboardRoute
   '/lesson': typeof LessonRoute
+  '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/battle': typeof BattleRoute
+  '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
+  '/exam': typeof ExamRoute
   '/leaderboard': typeof LeaderboardRoute
   '/lesson': typeof LessonRoute
+  '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/battle' | '/courses' | '/leaderboard' | '/lesson' | '/pricing'
+    | '/'
+    | '/admin'
+    | '/battle'
+    | '/certificate'
+    | '/courses'
+    | '/exam'
+    | '/leaderboard'
+    | '/lesson'
+    | '/map'
+    | '/pricing'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/battle' | '/courses' | '/leaderboard' | '/lesson' | '/pricing'
+  to:
+    | '/'
+    | '/admin'
+    | '/battle'
+    | '/certificate'
+    | '/courses'
+    | '/exam'
+    | '/leaderboard'
+    | '/lesson'
+    | '/map'
+    | '/pricing'
+    | '/profile'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/battle'
+    | '/certificate'
     | '/courses'
+    | '/exam'
     | '/leaderboard'
     | '/lesson'
+    | '/map'
     | '/pricing'
+    | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   BattleRoute: typeof BattleRoute
+  CertificateRoute: typeof CertificateRoute
   CoursesRoute: typeof CoursesRoute
+  ExamRoute: typeof ExamRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LessonRoute: typeof LessonRoute
+  MapRoute: typeof MapRoute
   PricingRoute: typeof PricingRoute
+  ProfileRoute: typeof ProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -106,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/battle': {
       id: '/battle'
       path: '/battle'
@@ -113,11 +196,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BattleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/certificate': {
+      id: '/certificate'
+      path: '/certificate'
+      fullPath: '/certificate'
+      preLoaderRoute: typeof CertificateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/courses': {
       id: '/courses'
       path: '/courses'
       fullPath: '/courses'
       preLoaderRoute: typeof CoursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam': {
+      id: '/exam'
+      path: '/exam'
+      fullPath: '/exam'
+      preLoaderRoute: typeof ExamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -134,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LessonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -141,16 +245,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   BattleRoute: BattleRoute,
+  CertificateRoute: CertificateRoute,
   CoursesRoute: CoursesRoute,
+  ExamRoute: ExamRoute,
   LeaderboardRoute: LeaderboardRoute,
   LessonRoute: LessonRoute,
+  MapRoute: MapRoute,
   PricingRoute: PricingRoute,
+  ProfileRoute: ProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

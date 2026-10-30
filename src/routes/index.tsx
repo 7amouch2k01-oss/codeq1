@@ -86,7 +86,7 @@ function Home() {
           <ol className="mt-4 space-y-3">
             {leaders.slice(0, 5).map((p, i) => (
               <li key={p.name} className="flex items-center justify-between">
-                <span><span className="mr-3 text-muted-foreground">{i + 1}</span>{p.name}</span>
+                <span className="flex items-center gap-3"><span className="text-muted-foreground">{i + 1}</span><img src={p.avatar} alt="" width={32} height={32} loading="lazy" className="h-8 w-8 rounded-md" />{p.name}</span>
                 <span className="font-semibold text-gold">{p.xp.toLocaleString()} XP</span>
               </li>
             ))}
