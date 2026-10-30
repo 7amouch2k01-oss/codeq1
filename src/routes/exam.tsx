@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 import { Shell } from "@/components/site";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/exam")({
   head: () => ({
@@ -29,7 +32,18 @@ function Exam() {
   const [secs, setSecs] = useState(25 * 60);
   const [done, setDone] = useState(false);
   useEffect(() => { const t = setInterval(() => setSecs((s) => Math.max(0, s - 1)), 1000); return () => clearInterval(t); }, []);
+  const { user, refresh } = useAuth();
   const q = qs[i]!;
+  const finish = async () => {
+    setDone(true);
+    if (!user) return;
+    const sc = Math.round((ans.filter((a, k) => a === qs[k]!.a).length / qs.length) * 100);
+    const { error } = await supabase.from("exam_results").insert({ user_id: user.id, exam_id: "python-beginner", score: sc, passed: sc >= 80 });
+    if (error) return toast.error("Couldn't save your result.");
+    if (sc >= 80) await supabase.rpc("award_xp", { _amount: 50 });
+    toast.success("Exam result saved.");
+    refresh();
+  };
   const score = Math.round((ans.filter((a, k) => a === qs[k]!.a).length / qs.length) * 100);
   return (
     <Shell>
@@ -41,7 +55,7 @@ function Exam() {
         {done ? (
           <div className="mt-8 text-center">
             <p className="font-display text-6xl font-bold text-primary">{score}%</p>
-            <p className="mt-2">{score >= 80 ? "You passed! Your certificate is ready." : "Not quite — you need 80% to pass."}</p>
+            <p className="mt-2">{score >= 80 ? "You passed! Your certificate is ready." : "Not quite — you need 80% to pass."}{!user && " Sign in to save your result."}</p>
             {score >= 80 ? <Link to="/certificate" className="mt-6 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">View certificate</Link> : <button onClick={() => { setAns([]); setI(0); setDone(false); }} className="mt-6 rounded-xl border border-border px-6 py-3">Try again</button>}
           </div>
         ) : (
@@ -59,7 +73,7 @@ function Exam() {
             </div>
             <div className="mt-6 flex justify-between">
               <button disabled={i === 0} onClick={() => setI(i - 1)} className="rounded-xl border border-border px-6 py-3 disabled:opacity-40">‹ Previous</button>
-              <button disabled={ans[i] === undefined} onClick={() => (i === qs.length - 1 ? setDone(true) : setI(i + 1))} className="rounded-xl bg-primary px-8 py-3 font-semibold text-primary-foreground disabled:opacity-40">{i === qs.length - 1 ? "Finish" : "Next ›"}</button>
+              <button disabled={ans[i] === undefined} onClick={() => (i === qs.length - 1 ? finish() : setI(i + 1))} className="rounded-xl bg-primary px-8 py-3 font-semibold text-primary-foreground disabled:opacity-40">{i === qs.length - 1 ? "Finish" : "Next ›"}</button>
             </div>
           </>
         )}
