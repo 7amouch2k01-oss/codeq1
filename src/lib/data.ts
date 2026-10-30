@@ -27,7 +27,7 @@ export function runPython(src: string): string {
     const l = (lines[i] ?? "").trim();
     const loop = l.match(/^for (\w+) in range\((\d+)(?:,\s*(\d+))?\):$/);
     if (loop) {
-      const [a, b] = loop[3] ? [+loop[2], +loop[3]] : [0, +loop[2]];
+      const [a, b] = loop[3] ? [Number(loop[2]), Number(loop[3])] : [0, Number(loop[2])];
       const body = lines[i + 1]?.trim() ?? "";
       for (let n = a; n < b; n++) out.push(evalPrint(body, loop[1], n));
       i++;
