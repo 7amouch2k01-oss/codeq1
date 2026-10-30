@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Play, Send, RotateCcw, Check, Lightbulb } from "lucide-react";
 import { Shell } from "@/components/site";
 import { runPython } from "@/lib/data";
+import { AiTutor } from "@/components/ai-tutor";
+import { useAuth, completeLesson } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/lesson")({
   head: () => ({
@@ -24,6 +27,7 @@ function Lesson() {
   const [out, setOut] = useState("");
   const [err, setErr] = useState("");
   const [done, setDone] = useState(false);
+  const { user, refresh } = useAuth();
   const run = () => {
     try { setOut(runPython(code)); setErr(""); return runPython(code); } catch (e) { setErr((e as Error).message); setOut(""); return null; }
   };
@@ -31,6 +35,7 @@ function Lesson() {
     const r = run();
     const ok = r === "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
     setDone(ok);
+    if (ok && user) completeLesson("python-4-loops", 20).then((n) => { if (n) toast.success("+20 XP saved!"); else toast("Already completed — progress saved."); refresh(); }).catch(() => toast.error("Couldn't save progress."));
     if (r !== null && !ok) setErr("Not quite — print 1 through 10, each on its own line.");
   };
   return (
@@ -44,7 +49,7 @@ function Lesson() {
         </div>
         <span className="rounded-full bg-secondary px-4 py-2 font-bold text-gold">+20 XP</span>
       </div>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-[1fr_1fr_360px]">
         <article className="panel p-6">
           <p className="eyebrow text-primary">Python Fundamentals</p>
           <h1 className="mt-2 text-4xl font-bold">Lesson 4: Loops</h1>
@@ -74,9 +79,10 @@ function Lesson() {
             <p className="eyebrow text-primary">Output</p>
             <pre className="mt-3 min-h-40 font-mono text-sm">{out}</pre>
             {err && <p className="font-mono text-sm text-destructive">{err}</p>}
-            {done && <p className="mt-2 font-semibold text-primary">✔ Quest complete! +20 XP earned.</p>}
+            {done && <p className="mt-2 font-semibold text-primary">✔ Quest complete! +20 XP earned.{!user && " Sign in to save it."}</p>}
           </div>
         </div>
+        <AiTutor lesson={{ title: "Python Fundamentals — Lesson 4: Loops", challenge: "Use a for loop to print the numbers 1 through 10, each on a new line." }} code={code} />
       </div>
     </Shell>
   );

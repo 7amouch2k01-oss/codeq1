@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png";
 import bgNight from "@/assets/bg-night.jpg";
 import type { ReactNode } from "react";
+import { Flame, LogOut } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/courses", label: "Courses" },
@@ -44,9 +49,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Link to="/courses" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground glow">
-            Start quest →
-          </Link>
+          <UserBox />
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-10">{children}</main>
@@ -57,6 +60,33 @@ export function Shell({ children }: { children: ReactNode }) {
           <span>© 2026 Questbound</span>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function UserBox() {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  if (!user)
+    return (
+      <div className="flex gap-2">
+        <Link to="/auth" className="rounded-lg border border-border px-4 py-2 text-sm">Sign in</Link>
+        <Link to="/auth" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground glow">Start quest →</Link>
+      </div>
+    );
+  const signOut = async () => {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+  return (
+    <div className="flex items-center gap-4 text-sm">
+      <span className="flex items-center gap-1 text-ember"><Flame className="h-4 w-4" />{profile?.streak ?? 0}</span>
+      <span className="font-bold text-gold">{(profile?.xp ?? 0).toLocaleString()} XP</span>
+      <Link to="/profile" className="font-semibold">{profile?.display_name ?? "You"}</Link>
+      <button onClick={signOut} aria-label="Sign out" className="text-muted-foreground hover:text-foreground"><LogOut className="h-4 w-4" /></button>
     </div>
   );
 }

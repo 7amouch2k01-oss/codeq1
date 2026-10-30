@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BattleRouteImport } from './routes/battle'
 import { Route as CertificateRouteImport } from './routes/certificate'
 import { Route as CoursesRouteImport } from './routes/courses'
@@ -20,6 +21,7 @@ import { Route as LessonRouteImport } from './routes/lesson'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BattleRoute = BattleRouteImport.update({
@@ -76,10 +83,16 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTutorRoute = ApiTutorRouteImport.update({
+  id: '/api/tutor',
+  path: '/api/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/battle': typeof BattleRoute
   '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
@@ -89,10 +102,12 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/api/tutor': typeof ApiTutorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/battle': typeof BattleRoute
   '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
@@ -102,11 +117,13 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/api/tutor': typeof ApiTutorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/battle': typeof BattleRoute
   '/certificate': typeof CertificateRoute
   '/courses': typeof CoursesRoute
@@ -116,12 +133,14 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/api/tutor': typeof ApiTutorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/auth'
     | '/battle'
     | '/certificate'
     | '/courses'
@@ -131,10 +150,12 @@ export interface FileRouteTypes {
     | '/map'
     | '/pricing'
     | '/profile'
+    | '/api/tutor'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/auth'
     | '/battle'
     | '/certificate'
     | '/courses'
@@ -144,10 +165,12 @@ export interface FileRouteTypes {
     | '/map'
     | '/pricing'
     | '/profile'
+    | '/api/tutor'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/auth'
     | '/battle'
     | '/certificate'
     | '/courses'
@@ -157,11 +180,13 @@ export interface FileRouteTypes {
     | '/map'
     | '/pricing'
     | '/profile'
+    | '/api/tutor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
   BattleRoute: typeof BattleRoute
   CertificateRoute: typeof CertificateRoute
   CoursesRoute: typeof CoursesRoute
@@ -171,6 +196,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
+  ApiTutorRoute: typeof ApiTutorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -187,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/battle': {
@@ -252,12 +285,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tutor': {
+      id: '/api/tutor'
+      path: '/api/tutor'
+      fullPath: '/api/tutor'
+      preLoaderRoute: typeof ApiTutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
   BattleRoute: BattleRoute,
   CertificateRoute: CertificateRoute,
   CoursesRoute: CoursesRoute,
@@ -267,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
+  ApiTutorRoute: ApiTutorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
