@@ -14,13 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      exam_results: {
+        Row: {
+          exam_id: string
+          id: string
+          passed: boolean
+          score: number
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          exam_id: string
+          id?: string
+          passed: boolean
+          score: number
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          exam_id?: string
+          id?: string
+          passed?: boolean
+          score?: number
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lesson_progress: {
+        Row: {
+          completed_at: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          last_active: string | null
+          streak: number
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          id: string
+          last_active?: string | null
+          streak?: number
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          last_active?: string | null
+          streak?: number
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_xp: {
+        Args: { _amount: number }
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+          last_active: string | null
+          streak: number
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
