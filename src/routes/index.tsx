@@ -38,9 +38,12 @@ function Home() {
 
       <section className="panel mt-14 grid gap-4 p-6 sm:grid-cols-4">
         {courses.map((c) => (
-          <Link key={c.id} to="/courses" className="rounded-lg p-2 hover:bg-secondary">
+          <Link key={c.id} to="/courses" className="flex items-center gap-3 rounded-lg p-2 hover:bg-secondary">
+            <img src={c.icon} alt={`${c.name} logo`} width={40} height={40} className="h-10 w-10" />
+            <div>
             <div className={`font-display text-lg font-bold ${c.color}`}>{c.name}</div>
             <div className="text-sm text-muted-foreground">{c.blurb.split(",")[0]}</div>
+            </div>
           </Link>
         ))}
       </section>

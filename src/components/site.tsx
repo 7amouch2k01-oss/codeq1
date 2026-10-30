@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Swords } from "lucide-react";
+import logo from "@/assets/logo.png";
+import bgNight from "@/assets/bg-night.jpg";
 import type { ReactNode } from "react";
 
 const nav = [
@@ -12,7 +13,7 @@ const nav = [
 export function Logo() {
   return (
     <Link to="/" className="flex items-center gap-2">
-      <Swords className="h-8 w-8 text-primary" />
+      <img src={logo} alt="" width={40} height={40} className="h-10 w-10 object-contain" />
       <div className="leading-none">
         <div className="font-display text-xl font-bold">Questbound</div>
         <div className="eyebrow text-[0.6rem] text-muted-foreground">Code Academy</div>
@@ -23,7 +24,8 @@ export function Logo() {
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
+      <img src={bgNight} alt="" aria-hidden className="pointer-events-none fixed inset-0 -z-10 h-full w-full object-cover opacity-40" />
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
           <Logo />
