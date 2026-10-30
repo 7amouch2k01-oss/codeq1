@@ -16,7 +16,7 @@ export const Route = createFileRoute("/leaderboard")({
 });
 
 function Board() {
-  const podium = [leaders[1], leaders[0], leaders[2]];
+  const podium = [leaders[1]!, leaders[0]!, leaders[2]!];
   return (
     <Shell>
       <div className="panel mx-auto max-w-3xl p-6">

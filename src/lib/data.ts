@@ -24,7 +24,7 @@ export function runPython(src: string): string {
   const out: string[] = [];
   const lines = src.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
   for (let i = 0; i < lines.length; i++) {
-    const l = lines[i].trim();
+    const l = (lines[i] ?? "").trim();
     const loop = l.match(/^for (\w+) in range\((\d+)(?:,\s*(\d+))?\):$/);
     if (loop) {
       const [a, b] = loop[3] ? [+loop[2], +loop[3]] : [0, +loop[2]];
@@ -40,7 +40,7 @@ export function runPython(src: string): string {
 function evalPrint(line: string, v?: string, n?: number) {
   const m = line.match(/^print\((.*)\)$/);
   if (!m) throw new Error(`Unsupported line: ${line}`);
-  const arg = m[1].trim();
+  const arg = (m[1] ?? "").trim();
   if (/^["'].*["']$/.test(arg)) return arg.slice(1, -1);
   if (arg === v) return String(n);
   throw new Error(`NameError: '${arg}' is not defined`);
