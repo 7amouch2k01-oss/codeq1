@@ -21,7 +21,8 @@ export function AiTutor({ lesson, code, output, error }: { lesson: { id: string;
 
   const ask = async (text: string) => {
     if (!user || !text.trim() || busy) return;
-    const next: Msg[] = [...msgs.filter((m) => m.content.trim()), { role: "user", content: text.trim() }].slice(-12);
+    const question: Msg = { role: "user", content: text.trim() };
+    const next: Msg[] = [...msgs.filter((m) => m.content.trim()), question].slice(-12);
     setMsgs([...next, { role: "assistant", content: "" }]);
     setInput(""); setErr(""); setBusy(true);
     const ac = new AbortController(); abortRef.current = ac;
