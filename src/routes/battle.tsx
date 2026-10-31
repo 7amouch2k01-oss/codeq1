@@ -49,7 +49,15 @@ function Battle() {
   const [terminalOut, setTerminalOut] = useState("");
   const [alreadyDone, setAlreadyDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const { user, refresh } = useAuth();
+  const { user, loading, refresh } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect guests to /auth
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [user, loading, navigate]);
 
   // Load today's battle from database
   useEffect(() => {

@@ -228,7 +228,14 @@ function ExamPage() {
   const [ans, setAns] = useState<number[]>([]);
   const [secs, setSecs] = useState(20 * 60);
   const [done, setDone] = useState(false);
-  const { user, refresh } = useAuth();
+  const { user, loading: authLoading, refresh } = useAuth();
+
+  // Redirect guests to /auth
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   // Reset when switching tracks
   useEffect(() => {

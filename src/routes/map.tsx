@@ -62,10 +62,17 @@ function MapPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const currentTrack: LanguageTrack = search.track || "python";
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+
+  // Redirect guests to /auth
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const trackLessons = Object.values(multiCourseRegistry).filter((l) => l.track === currentTrack);
 

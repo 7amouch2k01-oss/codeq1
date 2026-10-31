@@ -2,22 +2,12 @@ import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png";
 import bgNight from "@/assets/bg-night.jpg";
 import type { ReactNode } from "react";
-import { Flame, LogOut, Menu, X } from "lucide-react";
+import { Flame, LogOut, Menu, X, ShieldAlert } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
-
-const nav = [
-  { to: "/courses", label: "Courses" },
-  { to: "/battle", label: "Daily Battle" },
-  { to: "/leaderboard", label: "Leaderboard" },
-  { to: "/map", label: "Map" },
-  { to: "/exam", label: "Exam" },
-  { to: "/profile", label: "Profile" },
-  { to: "/pricing", label: "Pricing" },
-] as const;
 
 export function Logo() {
   return (
@@ -33,6 +23,26 @@ export function Logo() {
 
 export function Shell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, profile } = useAuth();
+
+  // Navigation filtering:
+  // Public users ONLY see Courses & Pricing
+  // Signed-in users see Daily Battle, Leaderboard, Map, Exam, Profile + Admin (if admin)
+  const navItems = user
+    ? [
+        { to: "/courses", label: "Courses" },
+        { to: "/battle", label: "Daily Battle" },
+        { to: "/leaderboard", label: "Leaderboard" },
+        { to: "/map", label: "Map" },
+        { to: "/exam", label: "Exam" },
+        { to: "/profile", label: "Profile" },
+        { to: "/pricing", label: "Pricing" },
+        ...((profile as any)?.is_admin ? [{ to: "/admin", label: "Admin" }] : []),
+      ]
+    : [
+        { to: "/courses", label: "Courses" },
+        { to: "/pricing", label: "Pricing" },
+      ];
 
   return (
     <div className="relative min-h-screen">
@@ -48,12 +58,12 @@ export function Shell({ children }: { children: ReactNode }) {
 
           {/* Desktop nav */}
           <nav className="hidden gap-2 md:flex">
-            {nav.map((n) => (
+            {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:text-foreground"
-                activeProps={{ className: "bg-secondary text-primary" }}
+                activeProps={{ className: "bg-secondary text-primary font-bold" }}
               >
                 {n.label}
               </Link>
@@ -77,13 +87,13 @@ export function Shell({ children }: { children: ReactNode }) {
         {mobileOpen && (
           <div className="border-t border-border/60 bg-background/95 px-6 py-4 md:hidden">
             <nav className="flex flex-col gap-1">
-              {nav.map((n) => (
+              {navItems.map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
                   onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-3 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-                  activeProps={{ className: "bg-secondary text-primary" }}
+                  activeProps={{ className: "bg-secondary text-primary font-bold" }}
                 >
                   {n.label}
                 </Link>
@@ -135,18 +145,20 @@ function UserBox() {
 
   return (
     <div className="flex items-center gap-4 text-sm">
-      <span className="flex items-center gap-1 text-ember">
+      <span className="flex items-center gap-1 text-ember font-semibold">
         <Flame className="h-4 w-4" />
         {profile?.streak ?? 0}
       </span>
-      <span className="font-bold text-gold">{(profile?.xp ?? 0).toLocaleString()} XP</span>
-      <Link to="/profile" className="font-semibold">
+      <span className="font-bold text-gold font-mono">
+        {(profile?.xp ?? 0).toLocaleString()} XP
+      </span>
+      <Link to="/profile" className="font-semibold hover:underline">
         {profile?.display_name ?? "You"}
       </Link>
       <button
         onClick={signOut}
         aria-label="Sign out"
-        className="text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground transition"
       >
         <LogOut className="h-4 w-4" />
       </button>

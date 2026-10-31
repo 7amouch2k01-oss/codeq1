@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Star, Flame, BookOpen, Trophy, Shield, Download, UserCheck } from "lucide-react";
 import { Shell } from "@/components/site";
 import { useEffect, useState } from "react";
@@ -86,7 +86,8 @@ const COURSE_LESSONS: Record<string, string[]> = {
 };
 
 function Profile() {
-  const { user, profile, refresh } = useAuth();
+  const { user, profile, loading: authLoading, refresh } = useAuth();
+  const navigate = useNavigate();
   const [lessons, setLessons] = useState<string[]>([]);
   const [exams, setExams] = useState<
     { exam_id: string; score: number; passed: boolean; taken_at: string }[]
@@ -94,6 +95,13 @@ function Profile() {
   const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [updatingAvatar, setUpdatingAvatar] = useState(false);
+
+  // Redirect guests to /auth
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (!user) return;
