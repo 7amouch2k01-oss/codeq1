@@ -3,32 +3,15 @@ import html from "@/assets/banner-html.jpg";
 import c from "@/assets/banner-c.jpg";
 import cpp from "@/assets/banner-cpp.jpg";
 const banners = { python, html, c, cpp };
-import rogue from "@/assets/av-rogue.jpg";
-import mage from "@/assets/av-mage.jpg";
-import king from "@/assets/av-king.jpg";
-import elf from "@/assets/av-elf.jpg";
-export const avatars = { rogue, mage, king, elf };
 
 export const courses = [
-  { id: "python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", banner: banners.python, name: "Python", blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.", progress: 2, popular: true, color: "text-gold" },
-  { id: "html", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg", banner: banners.html, name: "HTML", blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.", progress: 1, color: "text-ember" },
-  { id: "c", icon: "/c-logo.svg", banner: banners.c, name: "C", blurb: "Understand how computers work and build powerful, high-performance programs.", progress: 1, color: "text-sky" },
-  { id: "cpp", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg", banner: banners.cpp, name: "C++", blurb: "Take your skills further with modern C++. Build games, engines, and systems.", progress: 1, color: "text-sky" },
+  { id: "python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", banner: banners.python, name: "Python",  blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.", popular: true,  color: "text-gold" },
+  { id: "html",   icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",   banner: banners.html,   name: "HTML",    blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.",              color: "text-ember" },
+  { id: "c",      icon: "/c-logo.svg",                                                                   banner: banners.c,      name: "C",       blurb: "Understand how computers work and build powerful, high-performance programs.",                 color: "text-sky" },
+  { id: "cpp",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg", banner: banners.cpp, name: "C++", blurb: "Take your skills further with modern C++. Build games, engines, and systems.",               color: "text-sky" },
 ];
-export const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
-export const leaders = [
-  { name: "ByteKing", avatar: avatars.king, title: "Grand Coder", xp: 3120 },
-  { name: "CodeMage", avatar: avatars.mage, title: "Algorithm Adept", xp: 2340 },
-  { name: "SyntaxElf", avatar: avatars.elf, title: "Function Master", xp: 1980 },
-  { name: "DebugDrake", avatar: avatars.rogue, title: "Code Knight", xp: 1760 },
-  { name: "NullNinja", avatar: avatars.mage, title: "Algorithm Adept", xp: 1540 },
-  { name: "LoopLegend", avatar: avatars.king, title: "Code Knight", xp: 1320 },
-  { name: "ScriptSage", avatar: avatars.elf, title: "Function Master", xp: 1210 },
-  { name: "You", avatar: avatars.mage, title: "Code Knight", xp: 1080, me: true },
-  { name: "BracketBeast", avatar: avatars.rogue, title: "Bug Hunter", xp: 940 },
-  { name: "PixelPanda", avatar: avatars.elf, title: "Syntax Scholar", xp: 860 },
-];
+export const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
 /** Simulates running a tiny Python subset: supports `for i in range(a, b): print(i)` and print("..."). */
 export function runPython(src: string): string {
@@ -48,6 +31,7 @@ export function runPython(src: string): string {
   }
   return out.join("\n");
 }
+
 function evalPrint(line: string, v?: string, n?: number) {
   const m = line.match(/^print\((.*)\)$/);
   if (!m) throw new Error(`Unsupported line: ${line}`);

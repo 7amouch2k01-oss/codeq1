@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star, Flame, BookOpen, Trophy, Shield, Download } from "lucide-react";
 import { Shell } from "@/components/site";
-import { avatars } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,45 +17,211 @@ export const Route = createFileRoute("/profile")({
   component: Profile,
 });
 
-const badges = ["First Steps", "Python Novice", "Streak Master", "Code Knight", "Problem Solver", "Helpful Hero", "Consistent Coder"];
-const prog = [["Python Fundamentals", 90], ["Data Structures", 40], ["Web Development", 20], ["Algorithms", 0]] as const;
+type CourseProgress = { course: string; completed: number; total: number };
+
+const BADGE_THRESHOLDS = [
+  { name: "First Steps", color: "border-primary text-primary", req: (xp: number, lessons: number) => lessons >= 1 },
+  { name: "Python Novice", color: "border-sky text-sky", req: (xp: number, lessons: number) => lessons >= 3 },
+  { name: "Streak Starter", color: "border-ember text-ember", req: (xp: number, _: number, streak: number) => streak >= 3 },
+  { name: "Streak Master", color: "border-ember text-ember", req: (xp: number, _: number, streak: number) => streak >= 7 },
+  { name: "Code Knight", color: "border-gold text-gold", req: (xp: number) => xp >= 100 },
+  { name: "Problem Solver", color: "border-primary text-primary", req: (xp: number) => xp >= 500 },
+  { name: "Consistent Coder", color: "border-sky text-sky", req: (xp: number, lessons: number) => lessons >= 10 },
+  { name: "Algorithm Adept", color: "border-gold text-gold", req: (xp: number) => xp >= 2000 },
+];
+
+function rankTitle(xp: number) {
+  if (xp >= 3000) return "Grand Coder";
+  if (xp >= 2000) return "Algorithm Adept";
+  if (xp >= 1500) return "Function Master";
+  if (xp >= 1000) return "Code Knight";
+  if (xp >= 500) return "Bug Hunter";
+  return "Syntax Scholar";
+}
+
+const COURSE_LESSONS: Record<string, string[]> = {
+  "Python Fundamentals": ["python-1-variables", "python-2-conditionals", "python-3-functions", "python-4-loops", "python-5-projects"],
+  "Web Development":     ["html-1-intro", "html-2-forms", "html-3-css", "html-4-layout"],
+  "C Programming":       ["c-1-intro", "c-2-pointers", "c-3-structs", "c-4-memory"],
+  "C++ Programming":     ["cpp-1-intro", "cpp-2-oop", "cpp-3-templates", "cpp-4-stl"],
+};
 
 function Profile() {
   const { user, profile } = useAuth();
-  const [lessons, setLessons] = useState(0);
+  const [lessons, setLessons] = useState<string[]>([]);
   const [exams, setExams] = useState<{ exam_id: string; score: number; passed: boolean; taken_at: string }[]>([]);
+  const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
   useEffect(() => {
     if (!user) return;
-    supabase.from("lesson_progress").select("lesson_id", { count: "exact", head: true }).then(({ count }) => setLessons(count ?? 0));
-    supabase.from("exam_results").select("exam_id, score, passed, taken_at").order("taken_at", { ascending: false }).then(({ data }) => setExams(data ?? []));
+    Promise.all([
+      supabase.from("lesson_progress").select("lesson_id").eq("user_id", user.id),
+      supabase.from("exam_results").select("exam_id, score, passed, taken_at").eq("user_id", user.id).order("taken_at", { ascending: false }),
+    ]).then(([progressRes, examsRes]) => {
+      const completedIds = (progressRes.data ?? []).map((r) => r.lesson_id);
+      setLessons(completedIds);
+      setExams(examsRes.data ?? []);
+
+      const prog: CourseProgress[] = Object.entries(COURSE_LESSONS).map(([course, ids]) => ({
+        course,
+        completed: ids.filter((id) => completedIds.includes(id)).length,
+        total: ids.length,
+      }));
+      setCourseProgress(prog);
+      setDataLoading(false);
+    });
   }, [user]);
-  if (!user) return <Shell><div className="panel mx-auto max-w-md p-8 text-center"><h1 className="text-2xl font-bold">Your profile</h1><p className="mt-2 text-muted-foreground">Sign in to see your XP, streak and progress.</p><Link to="/auth" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Sign in</Link></div></Shell>;
+
+  if (!user) {
+    return (
+      <Shell>
+        <div className="panel mx-auto max-w-md p-8 text-center">
+          <h1 className="text-2xl font-bold">Your profile</h1>
+          <p className="mt-2 text-muted-foreground">Sign in to see your XP, streak and progress.</p>
+          <Link to="/auth" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Sign in</Link>
+        </div>
+      </Shell>
+    );
+  }
+
   const xp = profile?.xp ?? 0;
+  const streak = profile?.streak ?? 0;
   const level = Math.floor(xp / 100) + 1;
+  const xpToNext = 100 - (xp % 100);
   const passed = exams.filter((e) => e.passed);
+  const earnedBadges = BADGE_THRESHOLDS.filter((b) => b.req(xp, lessons.length, streak));
+  const initials = (profile?.display_name ?? user.email ?? "??").slice(0, 2).toUpperCase();
+
   return (
     <Shell>
+      {/* Hero card */}
       <div className="panel p-6">
         <div className="flex flex-wrap items-center gap-6">
-          <img src={avatars.rogue} alt="Alex" width={160} height={160} className="h-40 w-40 rounded-xl border-2 border-border" />
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold">{profile?.display_name}</h1>
-            <p className="flex items-center gap-1 text-gold"><Shield className="h-4 w-4" />Code Knight</p>
-            <p className="mt-2 text-muted-foreground">"Small steps. Big software."</p>
+          <div className="flex h-40 w-40 items-center justify-center rounded-xl border-2 border-border bg-secondary text-5xl font-bold text-primary">
+            {initials}
           </div>
-          <div className="panel w-64 p-4"><p className="text-xl font-bold">Level {level}</p><div className="mt-2 h-2 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: `${xp % 100}%` }} /></div><p className="mt-1 text-sm text-primary">{xp % 100} / 100 XP to next level</p></div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-4xl font-bold">{profile?.display_name ?? "Adventurer"}</h1>
+            <p className="flex items-center gap-1 text-gold">
+              <Shield className="h-4 w-4" />{rankTitle(xp)}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
+          </div>
+          {/* Level bar */}
+          <div className="panel w-64 p-4">
+            <p className="text-xl font-bold">Level {level}</p>
+            <div className="mt-2 h-2 rounded-full bg-muted">
+              <div className="h-2 rounded-full bg-primary" style={{ width: `${xp % 100}%` }} />
+            </div>
+            <p className="mt-1 text-sm text-primary">{xp % 100} / 100 XP to next level</p>
+          </div>
         </div>
+
+        {/* Stats */}
         <div className="mt-6 grid gap-4 sm:grid-cols-4">
-          {[[Star, String(xp), "Total XP", "text-gold"], [Flame, String(profile?.streak ?? 0), "Day Streak", "text-ember"], [BookOpen, String(lessons), "Lessons Completed", "text-sky"], [Trophy, String(passed.length), "Certificates Earned", "text-gold"]].map(([I, v, l, c]) => {
+          {[
+            [Star, String(xp.toLocaleString()), "Total XP", "text-gold"],
+            [Flame, String(streak), "Day Streak", "text-ember"],
+            [BookOpen, String(lessons.length), "Lessons Done", "text-sky"],
+            [Trophy, String(passed.length), "Certificates", "text-gold"],
+          ].map(([I, v, l, c]) => {
             const Icon = I as typeof Star;
-            return <div key={l as string} className="panel flex items-center gap-3 p-4"><Icon className={`h-7 w-7 ${c}`} /><div><div className="text-2xl font-bold">{v as string}</div><div className="text-sm text-muted-foreground">{l as string}</div></div></div>;
+            return (
+              <div key={l as string} className="panel flex items-center gap-3 p-4">
+                <Icon className={`h-7 w-7 ${c}`} />
+                <div>
+                  <div className="text-2xl font-bold">{v as string}</div>
+                  <div className="text-sm text-muted-foreground">{l as string}</div>
+                </div>
+              </div>
+            );
           })}
         </div>
+
+        {/* Badges + Progress */}
         <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          <div className="panel p-5"><h2 className="text-xl font-bold">Badges</h2><div className="mt-4 grid grid-cols-4 gap-4 text-center text-xs">{badges.map((b, i) => <div key={b}><div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl border-2 ${["border-primary text-primary", "border-sky text-sky", "border-ember text-ember", "border-gold text-gold"][i % 4]}`}><Shield className="h-6 w-6" /></div><p className="mt-1">{b}</p></div>)}</div></div>
-          <div className="panel p-5"><h2 className="text-xl font-bold">Course Progress</h2>{prog.map(([n, p]) => <div key={n} className="mt-4"><div className="flex justify-between text-sm"><span>{n}</span><span>{p}%</span></div><div className="mt-1 h-2 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: `${p}%` }} /></div></div>)}</div>
+          {/* Badges */}
+          <div className="panel p-5">
+            <h2 className="text-xl font-bold">Badges</h2>
+            {dataLoading ? (
+              <div className="mt-4 grid grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-4 gap-4 text-center text-xs">
+                {BADGE_THRESHOLDS.map((b) => {
+                  const earned = b.req(xp, lessons.length, streak);
+                  return (
+                    <div key={b.name} className={earned ? "" : "opacity-30"}>
+                      <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl border-2 ${earned ? b.color : "border-border text-muted-foreground"}`}>
+                        <Shield className="h-6 w-6" />
+                      </div>
+                      <p className="mt-1">{b.name}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <p className="mt-3 text-xs text-muted-foreground">{earnedBadges.length} / {BADGE_THRESHOLDS.length} badges earned</p>
+          </div>
+
+          {/* Course progress */}
+          <div className="panel p-5">
+            <h2 className="text-xl font-bold">Course Progress</h2>
+            {dataLoading ? (
+              <div className="mt-4 space-y-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-8 animate-pulse rounded-xl bg-muted" />
+                ))}
+              </div>
+            ) : (
+              courseProgress.map(({ course, completed, total }) => (
+                <div key={course} className="mt-4">
+                  <div className="flex justify-between text-sm">
+                    <span>{course}</span>
+                    <span className="text-muted-foreground">{completed}/{total}</span>
+                  </div>
+                  <div className="mt-1 h-2 rounded-full bg-muted">
+                    <div
+                      className="h-2 rounded-full bg-primary transition-all"
+                      style={{ width: total > 0 ? `${(completed / total) * 100}%` : "0%" }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-        <div className="panel mt-5 p-5"><h2 className="text-xl font-bold">Certificates</h2>{exams.length === 0 && <p className="mt-3 text-sm text-muted-foreground">No exams taken yet — <Link to="/exam" className="text-primary">take the Python Beginner Exam</Link>.</p>}{exams.map((c) => <div key={c.taken_at} className="mt-3 flex items-center justify-between border-t border-border pt-3"><span>Python Beginner Exam — {c.score}% {c.passed ? "✅ Passed" : "❌ Not passed"} · {new Date(c.taken_at).toLocaleDateString()}</span><Link to="/certificate" className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm"><Download className="h-4 w-4" />View</Link></div>)}</div>
+
+        {/* Certificates */}
+        <div className="panel mt-5 p-5">
+          <h2 className="text-xl font-bold">Certificates</h2>
+          {exams.length === 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              No exams taken yet — <Link to="/exam" className="text-primary">take the Python Beginner Exam</Link>.
+            </p>
+          ) : (
+            exams.map((c) => (
+              <div key={c.taken_at} className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                <span>
+                  Python Beginner Exam — {c.score}% {c.passed ? "✅ Passed" : "❌ Not passed"} ·{" "}
+                  {new Date(c.taken_at).toLocaleDateString()}
+                </span>
+                {c.passed && (
+                  <Link
+                    to="/certificate"
+                    className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm"
+                  >
+                    <Download className="h-4 w-4" />View
+                  </Link>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </Shell>
   );

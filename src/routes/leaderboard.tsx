@@ -1,46 +1,146 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
 import { Shell } from "@/components/site";
-import { leaders } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Weekly Leaderboard — Questbound" },
-      { name: "description", content: "Top coders this week on Questbound." },
-      { property: "og:title", content: "Weekly Leaderboard — Questbound" },
+      { title: "Leaderboard — Questbound" },
+      { name: "description", content: "Top coders on Questbound." },
+      { property: "og:title", content: "Leaderboard — Questbound" },
       { property: "og:description", content: "Top coders. Brighter tomorrows." },
     ],
   }),
   component: Board,
 });
 
+type Leader = { id: string; display_name: string; xp: number; streak: number };
+
+function rankTitle(xp: number) {
+  if (xp >= 3000) return "Grand Coder";
+  if (xp >= 2000) return "Algorithm Adept";
+  if (xp >= 1500) return "Function Master";
+  if (xp >= 1000) return "Code Knight";
+  if (xp >= 500) return "Bug Hunter";
+  return "Syntax Scholar";
+}
+
 function Board() {
-  const podium = [leaders[1]!, leaders[0]!, leaders[2]!];
+  const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    supabase
+      .from("profiles")
+      .select("id, display_name, xp, streak")
+      .order("xp", { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        setLeaders((data as Leader[]) ?? []);
+        setLoading(false);
+      });
+  }, []);
+
+  const podium = [leaders[1], leaders[0], leaders[2]].filter(Boolean) as Leader[];
+
   return (
     <Shell>
       <div className="panel mx-auto max-w-3xl p-6">
-        <div className="flex items-center gap-3"><Trophy className="h-10 w-10 text-gold" /><div><h1 className="text-4xl font-bold">Weekly Leaderboard</h1><p className="text-muted-foreground">Top coders. Brighter tomorrows.</p></div></div>
-        <div className="mt-8 grid grid-cols-3 items-end gap-4 text-center">
-          {podium.map((p, i) => (
-            <div key={p.name}>
-              <img src={p.avatar} alt={p.name} width={96} height={96} className={`mx-auto mb-2 rounded-xl border-2 ${i === 1 ? "h-24 w-24 border-gold" : "h-20 w-20 border-border"}`} />
-              <div className="font-bold">{p.name}</div>
-              <div className="font-bold text-gold">{p.xp.toLocaleString()} XP</div>
-              <div className={`mt-2 rounded-t-lg bg-secondary font-display text-3xl font-bold ${i === 1 ? "h-32 text-gold" : i === 0 ? "h-24" : "h-16 text-ember"} flex items-center justify-center`}>{[2, 1, 3][i]}</div>
-            </div>
-          ))}
+        <div className="flex items-center gap-3">
+          <Trophy className="h-10 w-10 text-gold" />
+          <div>
+            <h1 className="text-4xl font-bold">Leaderboard</h1>
+            <p className="text-muted-foreground">Top coders. Brighter tomorrows.</p>
+          </div>
         </div>
-        <table className="mt-6 w-full text-left">
-          <thead className="text-sm text-muted-foreground"><tr><th className="p-3">#</th><th>Player</th><th>Rank Title</th><th className="text-right">XP</th></tr></thead>
-          <tbody>
-            {leaders.slice(3).map((p, i) => (
-              <tr key={p.name} className={p.me ? "outline outline-1 outline-primary text-primary" : "border-t border-border"}>
-                <td className="p-3">{i + 4}</td><td><span className="flex items-center gap-3"><img src={p.avatar} alt="" width={36} height={36} loading="lazy" className="h-9 w-9 rounded-md border border-border" />{p.name}</span></td><td className="text-muted-foreground">{p.title}</td><td className="pr-3 text-right font-semibold text-gold">{p.xp.toLocaleString()} XP</td>
-              </tr>
+
+        {loading ? (
+          <div className="mt-8 space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-xl bg-muted" />
             ))}
-          </tbody>
-        </table>
+          </div>
+        ) : (
+          <>
+            {podium.length >= 3 && (
+              <div className="mt-8 grid grid-cols-3 items-end gap-4 text-center">
+                {podium.map((p, i) => (
+                  <div key={p.id}>
+                    <div
+                      className={`mx-auto mb-2 flex items-center justify-center rounded-xl border-2 font-display text-2xl font-bold ${
+                        i === 1 ? "h-24 w-24 border-gold text-gold" : "h-20 w-20 border-border"
+                      }`}
+                    >
+                      {p.display_name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className={`font-bold ${p.id === user?.id ? "text-primary" : ""}`}>
+                      {p.display_name}
+                      {p.id === user?.id && <span className="ml-1 text-xs">(you)</span>}
+                    </div>
+                    <div className="font-bold text-gold">{p.xp.toLocaleString()} XP</div>
+                    <div
+                      className={`mt-2 flex items-center justify-center rounded-t-lg bg-secondary font-display text-3xl font-bold ${
+                        i === 1 ? "h-32 text-gold" : i === 0 ? "h-24" : "h-16 text-ember"
+                      }`}
+                    >
+                      {[2, 1, 3][i]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <table className="mt-6 w-full text-left">
+              <thead className="text-sm text-muted-foreground">
+                <tr>
+                  <th className="p-3">#</th>
+                  <th>Player</th>
+                  <th>Rank</th>
+                  <th className="text-right">XP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaders.map((p, i) => (
+                  <tr
+                    key={p.id}
+                    className={
+                      p.id === user?.id
+                        ? "outline outline-1 outline-primary text-primary"
+                        : "border-t border-border"
+                    }
+                  >
+                    <td className="p-3">{i + 1}</td>
+                    <td>
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-sm font-bold">
+                          {p.display_name.slice(0, 2).toUpperCase()}
+                        </span>
+                        {p.display_name}
+                        {p.id === user?.id && (
+                          <span className="text-xs text-primary">(you)</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="text-muted-foreground">{rankTitle(p.xp)}</td>
+                    <td className="pr-3 text-right font-semibold text-gold">
+                      {p.xp.toLocaleString()} XP
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {leaders.length === 0 && (
+              <p className="mt-8 text-center text-muted-foreground">
+                No players yet — be the first to earn XP!
+              </p>
+            )}
+          </>
+        )}
       </div>
     </Shell>
   );

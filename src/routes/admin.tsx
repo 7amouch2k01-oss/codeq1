@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Users, User, GraduationCap, Coins } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Users, GraduationCap, Coins, BarChart3, ShieldAlert } from "lucide-react";
 import { Shell } from "@/components/site";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -15,44 +17,136 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-const seed = [
-  { n: "Alex Martin", e: "alex.martin@example.com", p: 100, r: 92, a: true },
-  { n: "Sophie Chen", e: "sophie.chen@example.com", p: 78, r: 85, a: true },
-  { n: "Marcus Lee", e: "marcus.lee@example.com", p: 45, r: 67, a: false },
-  { n: "Priya Patel", e: "priya.patel@example.com", p: 92, r: 90, a: true },
-  { n: "Daniel Kim", e: "daniel.kim@example.com", p: 31, r: 60, a: false },
-];
-const activity = [80, 110, 130, 140, 170, 200, 160, 190, 230, 250, 280, 260, 300, 340, 380, 360, 320, 290];
+type Student = {
+  id: string;
+  display_name: string;
+  xp: number;
+  streak: number;
+  created_at: string;
+  is_admin: boolean;
+};
 
 function Admin() {
-  const [rows, setRows] = useState(seed);
-  const max = 400;
-  const pts = activity.map((v, i) => `${(i / (activity.length - 1)) * 100},${100 - (v / max) * 100}`).join(" ");
+  const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+  const [students, setStudents] = useState<Student[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [stats, setStats] = useState({ total: 0, completions: 0, exams: 0 });
+
+  // ── Auth guard: redirect non-admins immediately ──
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { navigate({ to: "/auth", replace: true }); return; }
+    // @ts-expect-error is_admin added in 0001 migration
+    if (!profile?.is_admin) { navigate({ to: "/", replace: true }); }
+  }, [user, profile, loading, navigate]);
+
+  // ── Fetch real data ──
+  useEffect(() => {
+    // @ts-expect-error is_admin added in 0001 migration
+    if (!profile?.is_admin) return;
+
+    Promise.all([
+      supabase.from("profiles").select("id, display_name, xp, streak, created_at, is_admin").order("xp", { ascending: false }),
+      supabase.from("lesson_progress").select("lesson_id", { count: "exact", head: true }),
+      supabase.from("exam_results").select("id", { count: "exact", head: true }),
+    ]).then(([profilesRes, lessonsRes, examsRes]) => {
+      setStudents((profilesRes.data as Student[]) ?? []);
+      setStats({
+        total: profilesRes.data?.length ?? 0,
+        completions: lessonsRes.count ?? 0,
+        exams: examsRes.count ?? 0,
+      });
+      setDataLoading(false);
+    });
+    // @ts-expect-error is_admin added in 0001 migration
+  }, [profile?.is_admin]);
+
+  // Loading states
+  if (loading || dataLoading) {
+    return (
+      <Shell>
+        <div className="space-y-4">
+          <div className="h-10 w-48 animate-pulse rounded-xl bg-muted" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-28 animate-pulse rounded-xl bg-muted" />
+            ))}
+          </div>
+        </div>
+      </Shell>
+    );
+  }
+
+  // @ts-expect-error is_admin added in 0001 migration
+  if (!profile?.is_admin) {
+    return (
+      <Shell>
+        <div className="panel mx-auto max-w-md p-8 text-center">
+          <ShieldAlert className="mx-auto h-14 w-14 text-destructive" />
+          <h1 className="mt-4 text-2xl font-bold">Access Denied</h1>
+          <p className="mt-2 text-muted-foreground">You don't have admin privileges.</p>
+          <Link to="/" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Go home</Link>
+        </div>
+      </Shell>
+    );
+  }
+
+  const totalXP = students.reduce((s, r) => s + r.xp, 0);
+
   return (
     <Shell>
       <h1 className="text-4xl font-bold">Admin Dashboard</h1>
       <p className="text-muted-foreground">Track progress. Empower learners. Build a brighter future.</p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        {[[Users, "1,284", "Total students", "text-sky"], [User, "342", "Active today", "text-sky"], [GraduationCap, "89%", "Pass rate", "text-gold"], [Coins, "$12,460", "Revenue", "text-gold"]].map(([I, v, l, c]) => {
-          const Icon = I as typeof Users;
-          return <div key={l as string} className="panel p-5"><Icon className={`h-7 w-7 ${c}`} /><p className="mt-3 text-3xl font-bold">{v as string}</p><p className="text-sm text-muted-foreground">{l as string}</p></div>;
-        })}
+
+      {/* Stats */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { Icon: Users, v: stats.total.toLocaleString(), l: "Total students", c: "text-sky" },
+          { Icon: GraduationCap, v: stats.completions.toLocaleString(), l: "Lessons completed", c: "text-gold" },
+          { Icon: BarChart3, v: stats.exams.toLocaleString(), l: "Exams taken", c: "text-primary" },
+          { Icon: Coins, v: totalXP.toLocaleString(), l: "Total XP earned", c: "text-gold" },
+        ].map(({ Icon, v, l, c }) => (
+          <div key={l} className="panel p-5">
+            <Icon className={`h-7 w-7 ${c}`} />
+            <p className="mt-3 text-3xl font-bold">{v}</p>
+            <p className="text-sm text-muted-foreground">{l}</p>
+          </div>
+        ))}
       </div>
-      <div className="panel mt-5 p-5"><h2 className="text-xl font-bold">Student Activity</h2>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="mt-4 h-48 w-full"><polyline points={pts} fill="none" stroke="var(--primary)" strokeWidth="0.8" vectorEffect="non-scaling-stroke" /></svg>
-      </div>
-      <div className="panel mt-5 overflow-x-auto p-5"><h2 className="text-xl font-bold">Students</h2>
+
+      {/* Students table */}
+      <div className="panel mt-5 overflow-x-auto p-5">
+        <h2 className="text-xl font-bold">Students ({students.length})</h2>
         <table className="mt-4 w-full text-left text-sm">
-          <thead className="text-muted-foreground"><tr><th className="py-2">Name</th><th>Email</th><th>Progress</th><th>Pass rate</th><th>Access</th></tr></thead>
-          <tbody>{rows.map((r, i) => (
-            <tr key={r.e} className="border-t border-border">
-              <td className="py-3">{r.n}</td><td className="text-muted-foreground">{r.e}</td>
-              <td><div className="h-2 w-24 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: `${r.p}%` }} /></div></td>
-              <td>{r.r}%</td>
-              <td><button onClick={() => setRows(rows.map((x, k) => (k === i ? { ...x, a: !x.a } : x)))} className={`rounded-full px-3 py-1 ${r.a ? "bg-primary text-primary-foreground" : "border border-border"}`}>{r.a ? "Full access" : "Grant access"}</button></td>
+          <thead className="text-muted-foreground">
+            <tr>
+              <th className="py-2">Name</th>
+              <th>XP</th>
+              <th>Streak</th>
+              <th>Joined</th>
+              <th>Role</th>
             </tr>
-          ))}</tbody>
+          </thead>
+          <tbody>
+            {students.map((r) => (
+              <tr key={r.id} className="border-t border-border">
+                <td className="py-3 font-medium">{r.display_name}</td>
+                <td className="text-gold font-semibold">{r.xp.toLocaleString()}</td>
+                <td>{r.streak} days</td>
+                <td className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                <td>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${r.is_admin ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>
+                    {r.is_admin ? "Admin" : "Student"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
+        {students.length === 0 && (
+          <p className="mt-4 text-center text-muted-foreground">No students yet.</p>
+        )}
       </div>
     </Shell>
   );

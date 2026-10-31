@@ -14,6 +14,29 @@ export type Database = {
   }
   public: {
     Tables: {
+      battle_completions: {
+        Row: {
+          battle_date: string
+          user_id: string
+        }
+        Insert: {
+          battle_date?: string
+          user_id: string
+        }
+        Update: {
+          battle_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_completions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       exam_results: {
         Row: {
           exam_id: string
@@ -64,6 +87,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_admin: boolean
           last_active: string | null
           streak: number
           xp: number
@@ -72,6 +96,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id: string
+          is_admin?: boolean
           last_active?: string | null
           streak?: number
           xp?: number
@@ -80,6 +105,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_admin?: boolean
           last_active?: string | null
           streak?: number
           xp?: number
@@ -88,15 +114,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          display_name: string | null
+          id: string | null
+          streak: number | null
+          xp: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      award_battle_xp: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+          is_admin: boolean
+          last_active: string | null
+          streak: number
+          xp: number
+        }
+      }
       award_xp: {
         Args: { _amount: number }
         Returns: {
           created_at: string
           display_name: string
           id: string
+          is_admin: boolean
           last_active: string | null
           streak: number
           xp: number
