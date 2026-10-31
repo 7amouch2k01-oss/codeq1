@@ -1,13 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Swords, Clock, Play } from "lucide-react";
+import { Swords, Clock, Play, Sparkles } from "lucide-react";
 import { Shell } from "@/components/site";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
 import { executePythonCode } from "@/lib/pyodide-runner";
+import { CodeEditor } from "@/components/code-editor";
 import type { Database } from "@/integrations/supabase/types";
+import confetti from "canvas-confetti";
 
 type DailyBattle = Database["public"]["Tables"]["daily_battles"]["Row"];
 
@@ -108,7 +109,6 @@ function Battle() {
       const exec = await executePythonCode(code);
       setTerminalOut(exec.output || exec.error);
 
-      // Check whether output satisfies the expected solution
       const cleaned = (exec.output || "").trim();
       const expected = battle.expected_output.trim();
       const ok = !exec.error && cleaned.includes(expected);
@@ -119,6 +119,7 @@ function Battle() {
       }
 
       setResult("victory");
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
 
       if (!user) return;
 
@@ -129,7 +130,7 @@ function Battle() {
 
       const { data } = await supabase.rpc("award_battle_xp");
       if (data) {
-        toast.success(`+${battle.xp_reward} XP saved! Boss defeated.`);
+        toast.success(`+${battle.xp_reward} XP saved! PixelRogue has been defeated.`);
         setAlreadyDone(true);
         refresh();
       } else {
@@ -155,110 +156,113 @@ function Battle() {
               <p className="text-muted-foreground">Code today. Climb tomorrow.</p>
             </div>
           </div>
-          <div className="rounded-xl bg-code px-4 py-2">
-            <span className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              Next battle in
+          <div className="rounded-xl bg-code px-4 py-2 border border-border/80">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              Reset in
             </span>
-            <span className="font-mono text-2xl font-bold text-primary">{left}</span>
+            <span className="font-mono text-xl font-bold text-primary">{left}</span>
           </div>
         </div>
 
-        {/* VS */}
+        {/* VS Boss Area */}
         <div className="my-6 flex items-center justify-center gap-10 text-center">
           <div>
-            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-xl border-2 border-ember bg-muted text-2xl font-bold">
+            <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-ember bg-muted text-2xl font-bold">
               PR
             </div>
-            <div className="font-bold">PixelRogue</div>
-            <div className="text-sm text-muted-foreground">Boss Level</div>
+            <div className="font-bold text-sm">PixelRogue</div>
+            <div className="text-xs text-muted-foreground">Daily Boss</div>
           </div>
           <span className="font-display text-4xl font-bold text-ember">VS</span>
           <div>
-            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-xl border-2 border-primary bg-muted text-2xl font-bold text-primary">
+            <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-primary bg-muted text-2xl font-bold text-primary">
               {user ? (user.email ?? "U").slice(0, 2).toUpperCase() : "?"}
             </div>
-            <div className="font-bold text-primary">{user ? "You" : "Guest"}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="font-bold text-sm text-primary">{user ? "You" : "Guest"}</div>
+            <div className="text-xs text-muted-foreground">
               {user ? (
-                "Ready for battle"
+                "Challenger"
               ) : (
                 <Link to="/auth" className="text-primary underline">
-                  Sign in to save XP
+                  Sign in
                 </Link>
               )}
             </div>
           </div>
         </div>
 
-        {/* Challenge details */}
-        <div className="rounded-xl border border-border p-5">
+        {/* Challenge description */}
+        <div className="rounded-xl border border-border p-5 bg-card">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm text-muted-foreground">Today's Challenge</p>
-              <h2 className="text-2xl font-bold">{battle.title}</h2>
+              <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                Daily Quest
+              </p>
+              <h2 className="text-2xl font-bold mt-1">{battle.title}</h2>
             </div>
-            <span className="h-fit rounded-md border border-primary px-3 py-1 text-sm font-semibold text-primary">
+            <span className="h-fit rounded-full border border-primary/50 bg-secondary px-3 py-1 text-xs font-semibold text-primary">
               {battle.difficulty}
             </span>
           </div>
-          <p className="mt-2 text-muted-foreground">{battle.description}</p>
+          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{battle.description}</p>
           <div className="mt-3 grid grid-cols-2 gap-3 text-xs font-mono">
-            <div className="rounded-lg bg-code p-3">
-              <span className="text-muted-foreground">Sample Input:</span>
+            <div className="rounded-lg bg-code p-3 border border-border/40">
+              <span className="text-muted-foreground">Input:</span>
               <div className="mt-1 font-bold text-foreground">{battle.test_input}</div>
             </div>
-            <div className="rounded-lg bg-code p-3">
-              <span className="text-muted-foreground">Expected Output:</span>
+            <div className="rounded-lg bg-code p-3 border border-border/40">
+              <span className="text-muted-foreground">Expected Return:</span>
               <div className="mt-1 font-bold text-gold">{battle.expected_output}</div>
             </div>
           </div>
         </div>
 
         {alreadyDone && (
-          <div className="mt-4 rounded-xl border border-primary bg-secondary/60 px-5 py-3 text-center text-primary font-semibold">
-            ✅ You already completed today's battle — come back tomorrow!
+          <div className="mt-4 rounded-xl border border-primary bg-secondary/60 px-5 py-3 text-center text-primary font-semibold text-sm">
+            ✅ You already completed today's battle — check back tomorrow at 00:00 UTC!
           </div>
         )}
 
-        {/* Editor */}
-        <textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          spellCheck={false}
-          rows={7}
-          disabled={alreadyDone}
-          className="mt-4 w-full resize-none rounded-xl bg-code p-4 font-mono text-sm outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
-        />
+        {/* Monaco Editor */}
+        <div className="mt-4">
+          <CodeEditor
+            language="python"
+            value={code}
+            onChange={setCode}
+            height="240px"
+            readOnly={alreadyDone}
+          />
+        </div>
 
         {/* Terminal Run Output */}
         {terminalOut && (
-          <div className="mt-3 rounded-lg bg-code p-3 font-mono text-xs text-muted-foreground">
+          <div className="mt-3 rounded-lg bg-code p-3 font-mono text-xs text-muted-foreground border border-border/50">
             <span className="font-semibold text-primary">Execution output: </span>
             <span>{terminalOut}</span>
           </div>
         )}
 
-        {/* Footer */}
+        {/* Action Controls */}
         <div className="mt-4 flex items-center justify-between gap-4">
           <div className="text-gold">
-            <div className="text-sm text-muted-foreground">Reward</div>
+            <div className="text-xs text-muted-foreground">Bounty</div>
             <div className="text-2xl font-bold">+{battle.xp_reward} XP</div>
           </div>
           <button
             onClick={submit}
             disabled={alreadyDone || submitting}
-            className="flex items-center gap-2 rounded-xl bg-primary px-8 py-4 font-semibold text-primary-foreground glow transition hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 font-semibold text-primary-foreground glow transition hover:opacity-90 disabled:opacity-50"
           >
             <Play className="h-4 w-4" />
-            {submitting ? "Testing Code…" : "Run & Submit"}
+            {submitting ? "Testing Code…" : "Run & Battle"}
           </button>
         </div>
 
-        {/* Result Message */}
+        {/* Result outcome */}
         {result && (
           <p
-            className={`mt-4 font-semibold ${
+            className={`mt-4 font-semibold text-sm ${
               result === "victory" ? "text-primary" : "text-destructive"
             }`}
           >
