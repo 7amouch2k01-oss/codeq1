@@ -1,28 +1,26 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { Lock, Search, Crown } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Lock, Sparkles, UserPlus } from "lucide-react";
 import { Shell } from "@/components/site";
-import { courses, levels } from "@/lib/data";
-import mountains from "@/assets/bg-mountains.jpg";
+import { courses } from "@/lib/data";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import mountains from "@/assets/bg-mountains.jpg";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
     meta: [
-      { title: "Courses — Questbound" },
+      { title: "Course Catalog — Questbound" },
       {
         name: "description",
-        content: "Choose your path: Python, HTML, C or C++ quests from beginner to expert.",
+        content: "Explore gamified coding paths in Python, Web Craft, C, and Modern C++.",
       },
-      { property: "og:title", content: "Choose your path — Questbound" },
-      { property: "og:description", content: "Python, HTML, C and C++ coding quests." },
+      { property: "og:title", content: "Course Catalog — Questbound" },
     ],
   }),
-  component: Courses,
+  component: CoursesPage,
 });
 
-// Lesson IDs per course — used to calculate real progress
 const COURSE_LESSON_IDS: Record<string, string[]> = {
   python: [
     "python-1-variables",
@@ -37,12 +35,9 @@ const COURSE_LESSON_IDS: Record<string, string[]> = {
   cpp: ["cpp-1-intro", "cpp-2-oop", "cpp-3-templates", "cpp-4-stl"],
 };
 
-const LEVELS_PER_COURSE = 4;
-
-function Courses() {
-  const [filter, setFilter] = useState("All");
-  const [q, setQ] = useState("");
-  const { user } = useAuth();
+function CoursesPage() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -56,128 +51,142 @@ function Courses() {
         const map: Record<string, number> = {};
         for (const [courseId, ids] of Object.entries(COURSE_LESSON_IDS)) {
           const done = ids.filter((id) => completed.has(id)).length;
-          // Map to level progress (0–4)
-          map[courseId] = Math.min(
-            LEVELS_PER_COURSE,
-            Math.floor((done / ids.length) * LEVELS_PER_COURSE + (done > 0 ? 1 : 0)),
-          );
+          map[courseId] = done;
         }
         setProgressMap(map);
       });
   }, [user]);
 
-  const list = courses.filter(
-    (c) =>
-      (filter === "All" || c.name === filter) && c.name.toLowerCase().includes(q.toLowerCase()),
-  );
-
   return (
     <Shell>
-      <section className="relative overflow-hidden rounded-2xl px-8 py-12">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-2xl px-8 py-12 border border-border/80 shadow-2xl">
         <img
           src={mountains}
           alt=""
           width={1920}
           height={640}
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50"
         />
-        <p className="eyebrow text-muted-foreground">Learn › Practice › Level up</p>
-        <h1 className="mt-3 text-5xl font-bold">
-          Choose your <span className="text-primary">path</span>
+        <p className="eyebrow text-gold">Mastery Pathways</p>
+        <h1 className="mt-2 text-5xl font-bold tracking-tight">
+          Choose Your <span className="text-primary">Coding Adventure</span>
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Master real skills. Complete quests. Become a better you.
+        <p className="mt-3 text-lg text-muted-foreground max-w-2xl">
+          Four distinct mastery tracks with real browser execution, gamified XP, certification
+          exams, and interactive AI mentoring.
         </p>
       </section>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-2">
-          {["All", ...courses.map((c) => c.name)].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`rounded-full border px-5 py-2 ${filter === f ? "border-primary bg-secondary text-primary" : "border-border"}`}
+      {/* Mandatory Account Gate Banner for Non-Authenticated Learners */}
+      {!loading && !user && (
+        <div className="mt-8 rounded-2xl border-2 border-primary/50 bg-secondary/80 p-6 flex flex-wrap items-center justify-between gap-6 shadow-xl">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">
+              <Lock className="h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Account Registration Required</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Create a free adventurer account to save your XP, track lesson milestones, and climb
+                the leaderboard.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/auth"
+              className="rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground glow transition hover:opacity-90 flex items-center gap-2"
             >
-              {f}
-            </button>
-          ))}
+              <UserPlus className="h-4 w-4" /> Create Free Account
+            </Link>
+          </div>
         </div>
-        <label className="panel flex items-center gap-2 px-3 py-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search courses..."
-            className="bg-transparent outline-none"
-          />
-        </label>
-      </div>
+      )}
 
-      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {list.map((c) => {
-          const progress = user ? (progressMap[c.id] ?? 0) : 0;
+      {/* Courses Cards Grid */}
+      <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {courses.map((c) => {
+          const totalLessons = COURSE_LESSON_IDS[c.id]?.length || 4;
+          const completedCount = progressMap[c.id] || 0;
+          const percent = Math.round((completedCount / totalLessons) * 100);
+
           return (
-            <div key={c.id} className="panel flex flex-col overflow-hidden">
-              <div className="relative h-36">
+            <div
+              key={c.id}
+              className="panel flex flex-col overflow-hidden border border-border/80 hover:border-primary/50 transition-all shadow-md group"
+            >
+              <div className="relative h-40">
                 <img
                   src={c.banner}
                   alt=""
                   loading="lazy"
-                  width={1344}
-                  height={768}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
                 <img
                   src={c.icon}
                   alt={`${c.name} logo`}
-                  width={56}
-                  height={56}
-                  className="absolute bottom-2 left-5 h-14 w-14"
+                  className="absolute bottom-3 left-5 h-12 w-12 drop-shadow-lg"
                 />
               </div>
+
               <div className="flex flex-1 flex-col p-5">
-                {c.popular && (
-                  <span className="mb-2 flex w-fit items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs text-gold">
-                    <Crown className="h-3 w-3" />
-                    Most Popular
+                <div className="flex items-center justify-between">
+                  <h2 className={`text-2xl font-bold ${c.color}`}>{c.name}</h2>
+                  <span className="text-xs font-mono font-bold bg-muted px-2.5 py-1 rounded-full text-muted-foreground">
+                    {totalLessons} Quests
                   </span>
-                )}
-                <h2 className={`text-3xl font-bold ${c.color}`}>{c.name}</h2>
-                <p className="mt-2 flex-1 text-muted-foreground">{c.blurb}</p>
-                <div className="mt-4 grid grid-cols-4 gap-1.5">
-                  {levels.map((l, i) => (
+                </div>
+
+                <p className="mt-2 text-sm text-muted-foreground flex-1 leading-relaxed">
+                  {c.blurb}
+                </p>
+
+                {/* Level / Progress status */}
+                <div className="mt-5 border-t border-border/50 pt-4">
+                  <div className="flex justify-between text-xs font-medium text-muted-foreground mb-1.5">
+                    <span>Course Progress</span>
+                    <span className="font-bold text-foreground">
+                      {user
+                        ? `${completedCount}/${totalLessons} (${percent}%)`
+                        : "Locked (Sign in)"}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
                     <div
-                      key={l}
-                      className={`flex flex-col items-center rounded-lg border p-2 text-[0.65rem] ${
-                        i === 0
-                          ? "border-primary text-primary"
-                          : "border-border text-muted-foreground"
-                      }`}
+                      className="h-full bg-primary transition-all duration-500"
+                      style={{ width: user ? `${percent}%` : "0%" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Primary CTA */}
+                {user ? (
+                  <div className="mt-5 grid grid-cols-2 gap-2">
+                    <Link
+                      to="/map"
+                      search={{ track: c.id as any }}
+                      className="rounded-xl border border-border bg-card py-2.5 text-center text-xs font-bold text-foreground hover:bg-muted transition"
                     >
-                      <span className="truncate">{l}</span>
-                      {i === 0 ? <span>Free</span> : <Lock className="mt-1 h-3.5 w-3.5" />}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 flex justify-between text-sm">
-                  <span>
-                    Progress: {progress} / {LEVELS_PER_COURSE} levels
-                  </span>
-                  <span>{Math.round((progress / LEVELS_PER_COURSE) * 100)}%</span>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-muted">
-                  <div
-                    className="h-2 rounded-full bg-primary transition-all"
-                    style={{ width: `${(progress / LEVELS_PER_COURSE) * 100}%` }}
-                  />
-                </div>
-                <Link
-                  to="/map"
-                  className="mt-5 rounded-xl bg-primary py-3 text-center font-semibold text-primary-foreground"
-                >
-                  {progress > 0 ? "Continue →" : "Start →"}
-                </Link>
+                      Quest Map
+                    </Link>
+                    <Link
+                      to="/lesson"
+                      search={{ track: c.id as any }}
+                      className="rounded-xl bg-primary py-2.5 text-center text-xs font-bold text-primary-foreground glow hover:opacity-90 transition"
+                    >
+                      {completedCount > 0 ? "Continue →" : "Start Quest →"}
+                    </Link>
+                  </div>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="mt-5 rounded-xl bg-primary/90 py-2.5 text-center text-xs font-bold text-primary-foreground transition hover:opacity-100 flex items-center justify-center gap-1.5"
+                  >
+                    <Lock className="h-3.5 w-3.5" /> Sign In to Unlock
+                  </Link>
+                )}
               </div>
             </div>
           );
