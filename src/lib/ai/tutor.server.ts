@@ -1,7 +1,7 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText, type ModelMessage } from "ai";
 import { createClient } from "@supabase/supabase-js";
-import { loopsLesson, tutorRequestSchema } from "../lesson-context";
+import { lessonsRegistry, tutorRequestSchema } from "../lesson-context";
 import {
   createLovableAiGatewayRunIdFetch,
   getLovableAiGatewayRunId,
@@ -44,11 +44,12 @@ export async function handleTutor(request: Request) {
       { status: 400 },
     );
   const body = parsed.data;
+  const currentLesson = lessonsRegistry[body.lessonId] ?? lessonsRegistry["python-4-loops"];
   const history = body.messages as ModelMessage[];
   const instructions = `You are the Questbound AI Tutor, a friendly coding mentor for beginners.
-Current lesson: ${loopsLesson.title}
-Challenge: ${loopsLesson.challenge}
-Concepts: ${loopsLesson.concepts}
+Current lesson: ${currentLesson.title}
+Challenge: ${currentLesson.challenge}
+Concepts: ${currentLesson.concepts}
 Learner's current code:
 \`\`\`
 ${body.code}

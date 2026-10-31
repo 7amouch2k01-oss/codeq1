@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { Shell } from "@/components/site";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -24,12 +26,32 @@ const faqs = [
   ["Will I keep my progress if I upgrade?", "Absolutely. All XP, badges and progress carry over."],
   [
     "Are the certificates recognized?",
-    "Certificates verify your completed exams and can be shared on your profile.",
+    "Certificates verify your completed exams and can be shared on your profile or LinkedIn.",
   ],
 ];
 
 function Pricing() {
   const [yearly, setYearly] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSelectPlan = (planName: string) => {
+    if (!user) {
+      toast("Please sign in or create an account first.");
+      navigate({ to: "/auth" });
+      return;
+    }
+
+    if (planName === "Free Explorer") {
+      toast.success("You are on the Free Explorer plan!");
+      navigate({ to: "/courses" });
+      return;
+    }
+
+    // Direct user to Stripe / Checkout when configured, or confirm intent
+    toast.info(`${planName} checkout will be connected to your Stripe account upon deployment!`);
+  };
+
   const plans = [
     {
       n: "Free Explorer",
@@ -43,7 +65,7 @@ function Pricing() {
         "Track your progress",
       ],
       no: ["Exams and certificates"],
-      cta: "Get Started Free",
+      cta: user ? "Current Plan" : "Get Started Free",
     },
     {
       n: "Pro Adventurer",
@@ -76,6 +98,7 @@ function Pricing() {
       gold: true,
     },
   ];
+
   return (
     <Shell>
       <div className="text-center">
@@ -96,6 +119,7 @@ function Pricing() {
         </div>
         <p className="mt-2 text-sm text-primary">Save 17% with yearly</p>
       </div>
+
       <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
         {plans.map((p) => (
           <div
@@ -124,19 +148,27 @@ function Pricing() {
               ))}
             </ul>
             <button
-              className={`mt-6 rounded-xl py-3 font-semibold ${p.hot ? "bg-primary text-primary-foreground" : p.gold ? "border border-gold text-gold" : "border border-border"}`}
+              onClick={() => handleSelectPlan(p.n)}
+              className={`mt-6 rounded-xl py-3 font-semibold transition ${
+                p.hot
+                  ? "bg-primary text-primary-foreground hover:opacity-90"
+                  : p.gold
+                    ? "border border-gold text-gold hover:bg-gold/10"
+                    : "border border-border hover:bg-muted"
+              }`}
             >
               {p.cta}
             </button>
           </div>
         ))}
       </div>
+
       <div className="mx-auto mt-14 max-w-3xl">
         <h2 className="text-center text-3xl font-bold">Frequently Asked Questions</h2>
         <div className="mt-6 space-y-3">
           {faqs.map(([q, a]) => (
             <details key={q} className="panel p-4">
-              <summary className="cursor-pointer">{q}</summary>
+              <summary className="cursor-pointer font-medium">{q}</summary>
               <p className="mt-2 text-muted-foreground">{a}</p>
             </details>
           ))}
