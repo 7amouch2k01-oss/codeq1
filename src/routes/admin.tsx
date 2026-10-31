@@ -36,9 +36,14 @@ function Admin() {
   // ── Auth guard: redirect non-admins immediately ──
   useEffect(() => {
     if (loading) return;
-    if (!user) { navigate({ to: "/auth", replace: true }); return; }
+    if (!user) {
+      navigate({ to: "/auth", replace: true });
+      return;
+    }
     // @ts-expect-error is_admin added in 0001 migration
-    if (!profile?.is_admin) { navigate({ to: "/", replace: true }); }
+    if (!profile?.is_admin) {
+      navigate({ to: "/", replace: true });
+    }
   }, [user, profile, loading, navigate]);
 
   // ── Fetch real data ──
@@ -47,7 +52,10 @@ function Admin() {
     if (!profile?.is_admin) return;
 
     Promise.all([
-      supabase.from("profiles").select("id, display_name, xp, streak, created_at, is_admin").order("xp", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, display_name, xp, streak, created_at, is_admin")
+        .order("xp", { ascending: false }),
       supabase.from("lesson_progress").select("lesson_id", { count: "exact", head: true }),
       supabase.from("exam_results").select("id", { count: "exact", head: true }),
     ]).then(([profilesRes, lessonsRes, examsRes]) => {
@@ -86,7 +94,12 @@ function Admin() {
           <ShieldAlert className="mx-auto h-14 w-14 text-destructive" />
           <h1 className="mt-4 text-2xl font-bold">Access Denied</h1>
           <p className="mt-2 text-muted-foreground">You don't have admin privileges.</p>
-          <Link to="/" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Go home</Link>
+          <Link
+            to="/"
+            className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground"
+          >
+            Go home
+          </Link>
         </div>
       </Shell>
     );
@@ -97,13 +110,20 @@ function Admin() {
   return (
     <Shell>
       <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-      <p className="text-muted-foreground">Track progress. Empower learners. Build a brighter future.</p>
+      <p className="text-muted-foreground">
+        Track progress. Empower learners. Build a brighter future.
+      </p>
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { Icon: Users, v: stats.total.toLocaleString(), l: "Total students", c: "text-sky" },
-          { Icon: GraduationCap, v: stats.completions.toLocaleString(), l: "Lessons completed", c: "text-gold" },
+          {
+            Icon: GraduationCap,
+            v: stats.completions.toLocaleString(),
+            l: "Lessons completed",
+            c: "text-gold",
+          },
           { Icon: BarChart3, v: stats.exams.toLocaleString(), l: "Exams taken", c: "text-primary" },
           { Icon: Coins, v: totalXP.toLocaleString(), l: "Total XP earned", c: "text-gold" },
         ].map(({ Icon, v, l, c }) => (
@@ -134,9 +154,13 @@ function Admin() {
                 <td className="py-3 font-medium">{r.display_name}</td>
                 <td className="text-gold font-semibold">{r.xp.toLocaleString()}</td>
                 <td>{r.streak} days</td>
-                <td className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                <td className="text-muted-foreground">
+                  {new Date(r.created_at).toLocaleDateString()}
+                </td>
                 <td>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${r.is_admin ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${r.is_admin ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}
+                  >
                     {r.is_admin ? "Admin" : "Student"}
                   </span>
                 </td>

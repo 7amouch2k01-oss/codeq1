@@ -9,7 +9,10 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Your Profile — Questbound" },
-      { name: "description", content: "Your XP, streak, badges, course progress and certificates." },
+      {
+        name: "description",
+        content: "Your XP, streak, badges, course progress and certificates.",
+      },
       { property: "og:title", content: "Profile — Questbound" },
       { property: "og:description", content: "Track your coding adventure." },
     ],
@@ -20,13 +23,33 @@ export const Route = createFileRoute("/profile")({
 type CourseProgress = { course: string; completed: number; total: number };
 
 const BADGE_THRESHOLDS = [
-  { name: "First Steps", color: "border-primary text-primary", req: (xp: number, lessons: number) => lessons >= 1 },
-  { name: "Python Novice", color: "border-sky text-sky", req: (xp: number, lessons: number) => lessons >= 3 },
-  { name: "Streak Starter", color: "border-ember text-ember", req: (xp: number, _: number, streak: number) => streak >= 3 },
-  { name: "Streak Master", color: "border-ember text-ember", req: (xp: number, _: number, streak: number) => streak >= 7 },
+  {
+    name: "First Steps",
+    color: "border-primary text-primary",
+    req: (xp: number, lessons: number) => lessons >= 1,
+  },
+  {
+    name: "Python Novice",
+    color: "border-sky text-sky",
+    req: (xp: number, lessons: number) => lessons >= 3,
+  },
+  {
+    name: "Streak Starter",
+    color: "border-ember text-ember",
+    req: (xp: number, _: number, streak: number) => streak >= 3,
+  },
+  {
+    name: "Streak Master",
+    color: "border-ember text-ember",
+    req: (xp: number, _: number, streak: number) => streak >= 7,
+  },
   { name: "Code Knight", color: "border-gold text-gold", req: (xp: number) => xp >= 100 },
   { name: "Problem Solver", color: "border-primary text-primary", req: (xp: number) => xp >= 500 },
-  { name: "Consistent Coder", color: "border-sky text-sky", req: (xp: number, lessons: number) => lessons >= 10 },
+  {
+    name: "Consistent Coder",
+    color: "border-sky text-sky",
+    req: (xp: number, lessons: number) => lessons >= 10,
+  },
   { name: "Algorithm Adept", color: "border-gold text-gold", req: (xp: number) => xp >= 2000 },
 ];
 
@@ -40,16 +63,24 @@ function rankTitle(xp: number) {
 }
 
 const COURSE_LESSONS: Record<string, string[]> = {
-  "Python Fundamentals": ["python-1-variables", "python-2-conditionals", "python-3-functions", "python-4-loops", "python-5-projects"],
-  "Web Development":     ["html-1-intro", "html-2-forms", "html-3-css", "html-4-layout"],
-  "C Programming":       ["c-1-intro", "c-2-pointers", "c-3-structs", "c-4-memory"],
-  "C++ Programming":     ["cpp-1-intro", "cpp-2-oop", "cpp-3-templates", "cpp-4-stl"],
+  "Python Fundamentals": [
+    "python-1-variables",
+    "python-2-conditionals",
+    "python-3-functions",
+    "python-4-loops",
+    "python-5-projects",
+  ],
+  "Web Development": ["html-1-intro", "html-2-forms", "html-3-css", "html-4-layout"],
+  "C Programming": ["c-1-intro", "c-2-pointers", "c-3-structs", "c-4-memory"],
+  "C++ Programming": ["cpp-1-intro", "cpp-2-oop", "cpp-3-templates", "cpp-4-stl"],
 };
 
 function Profile() {
   const { user, profile } = useAuth();
   const [lessons, setLessons] = useState<string[]>([]);
-  const [exams, setExams] = useState<{ exam_id: string; score: number; passed: boolean; taken_at: string }[]>([]);
+  const [exams, setExams] = useState<
+    { exam_id: string; score: number; passed: boolean; taken_at: string }[]
+  >([]);
   const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -57,7 +88,11 @@ function Profile() {
     if (!user) return;
     Promise.all([
       supabase.from("lesson_progress").select("lesson_id").eq("user_id", user.id),
-      supabase.from("exam_results").select("exam_id, score, passed, taken_at").eq("user_id", user.id).order("taken_at", { ascending: false }),
+      supabase
+        .from("exam_results")
+        .select("exam_id, score, passed, taken_at")
+        .eq("user_id", user.id)
+        .order("taken_at", { ascending: false }),
     ]).then(([progressRes, examsRes]) => {
       const completedIds = (progressRes.data ?? []).map((r) => r.lesson_id);
       setLessons(completedIds);
@@ -79,7 +114,12 @@ function Profile() {
         <div className="panel mx-auto max-w-md p-8 text-center">
           <h1 className="text-2xl font-bold">Your profile</h1>
           <p className="mt-2 text-muted-foreground">Sign in to see your XP, streak and progress.</p>
-          <Link to="/auth" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Sign in</Link>
+          <Link
+            to="/auth"
+            className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground"
+          >
+            Sign in
+          </Link>
         </div>
       </Shell>
     );
@@ -104,7 +144,8 @@ function Profile() {
           <div className="flex-1 min-w-0">
             <h1 className="text-4xl font-bold">{profile?.display_name ?? "Adventurer"}</h1>
             <p className="flex items-center gap-1 text-gold">
-              <Shield className="h-4 w-4" />{rankTitle(xp)}
+              <Shield className="h-4 w-4" />
+              {rankTitle(xp)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
           </div>
@@ -156,7 +197,9 @@ function Profile() {
                   const earned = b.req(xp, lessons.length, streak);
                   return (
                     <div key={b.name} className={earned ? "" : "opacity-30"}>
-                      <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl border-2 ${earned ? b.color : "border-border text-muted-foreground"}`}>
+                      <div
+                        className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl border-2 ${earned ? b.color : "border-border text-muted-foreground"}`}
+                      >
                         <Shield className="h-6 w-6" />
                       </div>
                       <p className="mt-1">{b.name}</p>
@@ -165,7 +208,9 @@ function Profile() {
                 })}
               </div>
             )}
-            <p className="mt-3 text-xs text-muted-foreground">{earnedBadges.length} / {BADGE_THRESHOLDS.length} badges earned</p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {earnedBadges.length} / {BADGE_THRESHOLDS.length} badges earned
+            </p>
           </div>
 
           {/* Course progress */}
@@ -182,7 +227,9 @@ function Profile() {
                 <div key={course} className="mt-4">
                   <div className="flex justify-between text-sm">
                     <span>{course}</span>
-                    <span className="text-muted-foreground">{completed}/{total}</span>
+                    <span className="text-muted-foreground">
+                      {completed}/{total}
+                    </span>
                   </div>
                   <div className="mt-1 h-2 rounded-full bg-muted">
                     <div
@@ -201,11 +248,18 @@ function Profile() {
           <h2 className="text-xl font-bold">Certificates</h2>
           {exams.length === 0 ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              No exams taken yet — <Link to="/exam" className="text-primary">take the Python Beginner Exam</Link>.
+              No exams taken yet —{" "}
+              <Link to="/exam" className="text-primary">
+                take the Python Beginner Exam
+              </Link>
+              .
             </p>
           ) : (
             exams.map((c) => (
-              <div key={c.taken_at} className="mt-3 flex items-center justify-between border-t border-border pt-3">
+              <div
+                key={c.taken_at}
+                className="mt-3 flex items-center justify-between border-t border-border pt-3"
+              >
                 <span>
                   Python Beginner Exam — {c.score}% {c.passed ? "✅ Passed" : "❌ Not passed"} ·{" "}
                   {new Date(c.taken_at).toLocaleDateString()}
@@ -215,7 +269,8 @@ function Profile() {
                     to="/certificate"
                     className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm"
                   >
-                    <Download className="h-4 w-4" />View
+                    <Download className="h-4 w-4" />
+                    View
                   </Link>
                 )}
               </div>

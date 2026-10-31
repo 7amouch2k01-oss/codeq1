@@ -19,7 +19,8 @@ async function verifyUser(request: Request) {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -31,12 +32,17 @@ async function verifyUser(request: Request) {
 
 export async function handleTutor(request: Request) {
   const user = await verifyUser(request);
-  if (!user) return Response.json({ error: "Please sign in to use the AI tutor." }, { status: 401 });
+  if (!user)
+    return Response.json({ error: "Please sign in to use the AI tutor." }, { status: 401 });
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return Response.json({ error: "AI tutor is not configured." }, { status: 500 });
 
   const parsed = tutorRequestSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return Response.json({ error: "Enter a coding problem for this lesson (up to 4,000 characters)." }, { status: 400 });
+  if (!parsed.success)
+    return Response.json(
+      { error: "Enter a coding problem for this lesson (up to 4,000 characters)." },
+      { status: 400 },
+    );
   const body = parsed.data;
   const history = body.messages as ModelMessage[];
   const instructions = `You are the Questbound AI Tutor, a friendly coding mentor for beginners.
@@ -61,8 +67,17 @@ Respond to the learner's described coding problem with actionable hints grounded
     fetch: async (input, init) => {
       const response = await runIdFetch.fetch(input, init);
       if (!response.ok) {
-        const payload = await response.clone().json().catch(() => ({})) as { message?: string; error?: { message?: string } };
-        upstreamFailure = { status: response.status, message: payload.error?.message ?? payload.message ?? "The tutor request could not be completed." };
+        const payload = (await response
+          .clone()
+          .json()
+          .catch(() => ({}))) as { message?: string; error?: { message?: string } };
+        upstreamFailure = {
+          status: response.status,
+          message:
+            payload.error?.message ??
+            payload.message ??
+            "The tutor request could not be completed.",
+        };
       }
       return response;
     },
@@ -86,19 +101,30 @@ Respond to the learner's described coding problem with actionable hints grounded
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (event: object) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+      const send = (event: object) =>
+        controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
       try {
         for await (const part of result.fullStream) {
           if (part.type === "text-delta") send({ text: part.text });
-          if (part.type === "error") send({ error: upstreamFailure?.message ?? "The tutor's response was interrupted." });
+          if (part.type === "error")
+            send({ error: upstreamFailure?.message ?? "The tutor's response was interrupted." });
         }
       } catch (error) {
-        if (!request.signal.aborted) send({ error: upstreamFailure?.message ?? "The tutor's response was interrupted." });
-      } finally { controller.close(); }
+        if (!request.signal.aborted)
+          send({ error: upstreamFailure?.message ?? "The tutor's response was interrupted." });
+      } finally {
+        controller.close();
+      }
     },
   });
   await runIdFetch.waitForRunId();
   if (request.signal.aborted) return new Response(null, { status: 499 });
-  if (upstreamFailure) return Response.json({ error: upstreamFailure.message }, { status: upstreamFailure.status });
-  return withLovableAiGatewayRunIdHeader(new Response(stream, { headers: { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store" } }), runIdFetch);
+  if (upstreamFailure)
+    return Response.json({ error: upstreamFailure.message }, { status: upstreamFailure.status });
+  return withLovableAiGatewayRunIdHeader(
+    new Response(stream, {
+      headers: { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store" },
+    }),
+    runIdFetch,
+  );
 }

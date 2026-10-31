@@ -67,7 +67,9 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
   body {
     background:
       radial-gradient(ellipse at top, oklch(0.24 0.06 255), transparent 60%),
@@ -76,10 +78,17 @@
     font-family: var(--font-sans);
     min-height: 100vh;
   }
-  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
 }
 
-@utility glow { box-shadow: var(--glow); }
+@utility glow {
+  box-shadow: var(--glow);
+}
 @utility panel {
   background: color-mix(in oklab, var(--card) 85%, transparent);
   border: 1px solid var(--border);

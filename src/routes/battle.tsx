@@ -39,7 +39,7 @@ function Battle() {
       setLeft(
         [s / 3600, (s % 3600) / 60, s % 60]
           .map((n) => String(Math.floor(n)).padStart(2, "0"))
-          .join(":")
+          .join(":"),
       );
     };
     tick();
@@ -64,8 +64,7 @@ function Battle() {
 
   const submit = async () => {
     const ok =
-      /return\s+s\[::-1\]/.test(code) ||
-      /return\s+["']{2}\.join\(reversed\(s\)\)/.test(code);
+      /return\s+s\[::-1\]/.test(code) || /return\s+["']{2}\.join\(reversed\(s\)\)/.test(code);
 
     if (!ok) {
       setResult("fail");
@@ -113,7 +112,8 @@ function Battle() {
           </div>
           <div className="rounded-xl bg-code px-4 py-2">
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />Ends in
+              <Clock className="h-4 w-4" />
+              Ends in
             </span>
             <span className="font-mono text-2xl font-bold text-primary">{left}</span>
           </div>
@@ -122,7 +122,9 @@ function Battle() {
         {/* VS */}
         <div className="my-6 flex items-center justify-center gap-10 text-center">
           <div>
-            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-xl border-2 border-ember bg-muted text-2xl font-bold">PR</div>
+            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-xl border-2 border-ember bg-muted text-2xl font-bold">
+              PR
+            </div>
             <div className="font-bold">PixelRogue</div>
             <div className="text-sm text-muted-foreground">Level 12</div>
           </div>
@@ -133,8 +135,12 @@ function Battle() {
             </div>
             <div className="font-bold text-primary">{user ? "You" : "Guest"}</div>
             <div className="text-sm text-muted-foreground">
-              {user ? "Signed in" : (
-                <Link to="/auth" className="text-primary underline">Sign in to save XP</Link>
+              {user ? (
+                "Signed in"
+              ) : (
+                <Link to="/auth" className="text-primary underline">
+                  Sign in to save XP
+                </Link>
               )}
             </div>
           </div>
@@ -147,7 +153,9 @@ function Battle() {
               <p className="text-sm text-muted-foreground">Today's Challenge</p>
               <h2 className="text-2xl font-bold">Reverse a string</h2>
             </div>
-            <span className="h-fit rounded-md border border-primary px-3 py-1 text-sm text-primary">Easy</span>
+            <span className="h-fit rounded-md border border-primary px-3 py-1 text-sm text-primary">
+              Easy
+            </span>
           </div>
           <p className="mt-2 text-muted-foreground">
             Given a string s, return a new string with the characters in reverse order.

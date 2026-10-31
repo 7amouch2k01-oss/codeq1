@@ -1,289 +1,277 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.18"
-  }
+    PostgrestVersion: "14.18";
+  };
   public: {
     Tables: {
       battle_completions: {
         Row: {
-          battle_date: string
-          user_id: string
-        }
+          battle_date: string;
+          user_id: string;
+        };
         Insert: {
-          battle_date?: string
-          user_id: string
-        }
+          battle_date?: string;
+          user_id: string;
+        };
         Update: {
-          battle_date?: string
-          user_id?: string
-        }
+          battle_date?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "battle_completions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
+            foreignKeyName: "battle_completions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       exam_results: {
         Row: {
-          exam_id: string
-          id: string
-          passed: boolean
-          score: number
-          taken_at: string
-          user_id: string
-        }
+          exam_id: string;
+          id: string;
+          passed: boolean;
+          score: number;
+          taken_at: string;
+          user_id: string;
+        };
         Insert: {
-          exam_id: string
-          id?: string
-          passed: boolean
-          score: number
-          taken_at?: string
-          user_id: string
-        }
+          exam_id: string;
+          id?: string;
+          passed: boolean;
+          score: number;
+          taken_at?: string;
+          user_id: string;
+        };
         Update: {
-          exam_id?: string
-          id?: string
-          passed?: boolean
-          score?: number
-          taken_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          exam_id?: string;
+          id?: string;
+          passed?: boolean;
+          score?: number;
+          taken_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       lesson_progress: {
         Row: {
-          completed_at: string
-          lesson_id: string
-          user_id: string
-        }
+          completed_at: string;
+          lesson_id: string;
+          user_id: string;
+        };
         Insert: {
-          completed_at?: string
-          lesson_id: string
-          user_id: string
-        }
+          completed_at?: string;
+          lesson_id: string;
+          user_id: string;
+        };
         Update: {
-          completed_at?: string
-          lesson_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          completed_at?: string;
+          lesson_id?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
-          created_at: string
-          display_name: string
-          id: string
-          is_admin: boolean
-          last_active: string | null
-          streak: number
-          xp: number
-        }
+          created_at: string;
+          display_name: string;
+          id: string;
+          is_admin: boolean;
+          last_active: string | null;
+          streak: number;
+          xp: number;
+        };
         Insert: {
-          created_at?: string
-          display_name?: string
-          id: string
-          is_admin?: boolean
-          last_active?: string | null
-          streak?: number
-          xp?: number
-        }
+          created_at?: string;
+          display_name?: string;
+          id: string;
+          is_admin?: boolean;
+          last_active?: string | null;
+          streak?: number;
+          xp?: number;
+        };
         Update: {
-          created_at?: string
-          display_name?: string
-          id?: string
-          is_admin?: boolean
-          last_active?: string | null
-          streak?: number
-          xp?: number
-        }
-        Relationships: []
-      }
-    }
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          is_admin?: boolean;
+          last_active?: string | null;
+          streak?: number;
+          xp?: number;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
       leaderboard: {
         Row: {
-          display_name: string | null
-          id: string | null
-          streak: number | null
-          xp: number | null
-        }
-        Relationships: []
-      }
-    }
+          display_name: string | null;
+          id: string | null;
+          streak: number | null;
+          xp: number | null;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {
       award_battle_xp: {
-        Args: Record<PropertyKey, never>
+        Args: Record<PropertyKey, never>;
         Returns: {
-          created_at: string
-          display_name: string
-          id: string
-          is_admin: boolean
-          last_active: string | null
-          streak: number
-          xp: number
-        }
-      }
+          created_at: string;
+          display_name: string;
+          id: string;
+          is_admin: boolean;
+          last_active: string | null;
+          streak: number;
+          xp: number;
+        };
+      };
       award_xp: {
-        Args: { _amount: number }
+        Args: { _amount: number };
         Returns: {
-          created_at: string
-          display_name: string
-          id: string
-          is_admin: boolean
-          last_active: string | null
-          streak: number
-          xp: number
-        }
+          created_at: string;
+          display_name: string;
+          id: string;
+          is_admin: boolean;
+          last_active: string | null;
+          streak: number;
+          xp: number;
+        };
         SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-    }
+          from: "*";
+          to: "profiles";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+    };
     Enums: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["CompositeTypes"] | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
     Enums: {},
   },
-} as const
+} as const;

@@ -120,9 +120,7 @@ function Board() {
                           {p.display_name.slice(0, 2).toUpperCase()}
                         </span>
                         {p.display_name}
-                        {p.id === user?.id && (
-                          <span className="text-xs text-primary">(you)</span>
-                        )}
+                        {p.id === user?.id && <span className="text-xs text-primary">(you)</span>}
                       </span>
                     </td>
                     <td className="text-muted-foreground">{rankTitle(p.xp)}</td>

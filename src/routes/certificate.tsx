@@ -26,7 +26,10 @@ function Cert() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from("exam_results")
       .select("score, taken_at")
@@ -47,7 +50,12 @@ function Cert() {
       <Shell>
         <div className="panel mx-auto max-w-md p-8 text-center">
           <h1 className="text-2xl font-bold">Sign in to view your certificate</h1>
-          <Link to="/auth" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Sign in</Link>
+          <Link
+            to="/auth"
+            className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground"
+          >
+            Sign in
+          </Link>
         </div>
       </Shell>
     );
@@ -68,8 +76,15 @@ function Cert() {
       <Shell>
         <div className="panel mx-auto max-w-md p-8 text-center">
           <h1 className="text-2xl font-bold">No certificate yet</h1>
-          <p className="mt-2 text-muted-foreground">Pass the Python Beginner Exam with 80%+ to earn your certificate.</p>
-          <Link to="/exam" className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground">Take the Exam →</Link>
+          <p className="mt-2 text-muted-foreground">
+            Pass the Python Beginner Exam with 80%+ to earn your certificate.
+          </p>
+          <Link
+            to="/exam"
+            className="mt-5 inline-block rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground"
+          >
+            Take the Exam →
+          </Link>
         </div>
       </Shell>
     );
@@ -81,7 +96,9 @@ function Cert() {
   return (
     <Shell>
       <div className="mx-auto max-w-2xl">
-        <Link to="/profile" className="text-muted-foreground">← Back to profile</Link>
+        <Link to="/profile" className="text-muted-foreground">
+          ← Back to profile
+        </Link>
         <div
           id="certificate"
           className="relative mt-4 overflow-hidden rounded-xl border-4 border-double border-gold p-10 text-center"
@@ -107,7 +124,13 @@ function Cert() {
             </div>
             <div>
               <p className="eyebrow text-muted-foreground">Completed</p>
-              <p className="text-lg font-bold">{new Date(exam.taken_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+              <p className="text-lg font-bold">
+                {new Date(exam.taken_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
             </div>
             <div>
               <p className="eyebrow text-muted-foreground">Certificate ID</p>
@@ -120,7 +143,8 @@ function Cert() {
             onClick={() => window.print()}
             className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground"
           >
-            <Download className="h-4 w-4" />Download PDF
+            <Download className="h-4 w-4" />
+            Download PDF
           </button>
           <button
             onClick={() => {
@@ -129,7 +153,8 @@ function Cert() {
             }}
             className="flex items-center justify-center gap-2 rounded-xl border border-border py-3 font-semibold"
           >
-            <Share2 className="h-4 w-4" />Share Certificate
+            <Share2 className="h-4 w-4" />
+            Share Certificate
           </button>
         </div>
       </div>

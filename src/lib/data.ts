@@ -5,10 +5,39 @@ import cpp from "@/assets/banner-cpp.jpg";
 const banners = { python, html, c, cpp };
 
 export const courses = [
-  { id: "python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", banner: banners.python, name: "Python",  blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.", popular: true,  color: "text-gold" },
-  { id: "html",   icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",   banner: banners.html,   name: "HTML",    blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.",              color: "text-ember" },
-  { id: "c",      icon: "/c-logo.svg",                                                                   banner: banners.c,      name: "C",       blurb: "Understand how computers work and build powerful, high-performance programs.",                 color: "text-sky" },
-  { id: "cpp",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg", banner: banners.cpp, name: "C++", blurb: "Take your skills further with modern C++. Build games, engines, and systems.",               color: "text-sky" },
+  {
+    id: "python",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+    banner: banners.python,
+    name: "Python",
+    blurb: "Build real projects, automate the boring stuff, and unlock endless possibilities.",
+    popular: true,
+    color: "text-gold",
+  },
+  {
+    id: "html",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+    banner: banners.html,
+    name: "HTML",
+    blurb: "Create beautiful, accessible web pages and bring your ideas to life on the web.",
+    color: "text-ember",
+  },
+  {
+    id: "c",
+    icon: "/c-logo.svg",
+    banner: banners.c,
+    name: "C",
+    blurb: "Understand how computers work and build powerful, high-performance programs.",
+    color: "text-sky",
+  },
+  {
+    id: "cpp",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+    banner: banners.cpp,
+    name: "C++",
+    blurb: "Take your skills further with modern C++. Build games, engines, and systems.",
+    color: "text-sky",
+  },
 ];
 
 export const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];

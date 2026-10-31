@@ -143,7 +143,11 @@ function UserBox() {
       <Link to="/profile" className="font-semibold">
         {profile?.display_name ?? "You"}
       </Link>
-      <button onClick={signOut} aria-label="Sign out" className="text-muted-foreground hover:text-foreground">
+      <button
+        onClick={signOut}
+        aria-label="Sign out"
+        className="text-muted-foreground hover:text-foreground"
+      >
         <LogOut className="h-4 w-4" />
       </button>
     </div>

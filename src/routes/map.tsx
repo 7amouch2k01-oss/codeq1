@@ -19,12 +19,12 @@ export const Route = createFileRoute("/map")({
 });
 
 const beginner = [
-  { label: "Welcome to Python",       id: "python-1-variables" },
-  { label: "Variables & Data Types",  id: "python-2-conditionals" },
+  { label: "Welcome to Python", id: "python-1-variables" },
+  { label: "Variables & Data Types", id: "python-2-conditionals" },
   { label: "Operators & Expressions", id: "python-3-functions" },
-  { label: "Control Flow",            id: "python-4-loops" },
-  { label: "Functions",               id: "python-5-projects" },
-  { label: "Lists and Loops",         id: "python-6-lists" },
+  { label: "Control Flow", id: "python-4-loops" },
+  { label: "Functions", id: "python-5-projects" },
+  { label: "Lists and Loops", id: "python-6-lists" },
 ];
 
 const inter = [
@@ -41,7 +41,10 @@ function MapPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from("lesson_progress")
       .select("lesson_id")
@@ -94,7 +97,10 @@ function MapPage() {
                 const done = completed.has(lesson.id);
                 const isCurrent = !loading && i === currentIndex;
                 return (
-                  <li key={lesson.id} className="flex flex-col items-center text-center text-sm font-semibold">
+                  <li
+                    key={lesson.id}
+                    className="flex flex-col items-center text-center text-sm font-semibold"
+                  >
                     {isCurrent ? (
                       <>
                         <span className="mb-1 rounded bg-foreground px-2 text-xs text-background">
@@ -133,11 +139,16 @@ function MapPage() {
             <p className="text-muted-foreground">Upgrade to continue your journey</p>
             <ol className="mt-6 grid grid-cols-3 gap-6 md:grid-cols-6">
               {inter.map((l, i) => (
-                <li key={l} className="flex flex-col items-center text-center text-sm text-muted-foreground">
+                <li
+                  key={l}
+                  className="flex flex-col items-center text-center text-sm text-muted-foreground"
+                >
                   <span className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-border">
                     <Lock className="h-4 w-4" />
                   </span>
-                  <span className="mt-2">{i + 7}. {l}</span>
+                  <span className="mt-2">
+                    {i + 7}. {l}
+                  </span>
                 </li>
               ))}
               <li className="flex flex-col items-center text-center">
@@ -161,7 +172,9 @@ function MapPage() {
                   {total > 0 ? Math.round((completedCount / total) * 100) : 0}%
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {user ? `${completedCount} of ${total} lessons completed` : "Sign in to track progress"}
+                  {user
+                    ? `${completedCount} of ${total} lessons completed`
+                    : "Sign in to track progress"}
                 </p>
                 <div className="mt-2 h-2 rounded-full bg-muted">
                   <div
@@ -184,14 +197,16 @@ function MapPage() {
               to="/lesson"
               className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground"
             >
-              <Play className="h-4 w-4" />Start Lesson
+              <Play className="h-4 w-4" />
+              Start Lesson
             </Link>
           </div>
 
           {/* Upgrade */}
           <div className="panel border-gold p-5">
             <h3 className="flex items-center gap-2 text-lg font-bold">
-              <Crown className="h-5 w-5 text-gold" />Unlock All Levels
+              <Crown className="h-5 w-5 text-gold" />
+              Unlock All Levels
             </h3>
             <p className="text-sm text-muted-foreground">
               Get full access to intermediate lessons, projects, and more.

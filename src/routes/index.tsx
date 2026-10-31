@@ -10,9 +10,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Questbound — Level up your code, one quest at a time" },
-      { name: "description", content: "Learn Python, HTML, C and C++ through interactive coding quests, daily battles and leaderboards." },
+      {
+        name: "description",
+        content:
+          "Learn Python, HTML, C and C++ through interactive coding quests, daily battles and leaderboards.",
+      },
       { property: "og:title", content: "Questbound Code Academy" },
-      { property: "og:description", content: "Learn to code through quests, battles and real projects." },
+      {
+        property: "og:description",
+        content: "Learn to code through quests, battles and real projects.",
+      },
     ],
   }),
   component: Home,
@@ -41,10 +48,14 @@ function Home() {
             Level up your code, <span className="text-primary">one quest</span> at a time.
           </h1>
           <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-            Questbound makes coding fun with interactive quests, real projects, and a community that builds together.
+            Questbound makes coding fun with interactive quests, real projects, and a community that
+            builds together.
           </p>
           <div className="mt-8 flex gap-3">
-            <Link to="/courses" className="rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground glow">
+            <Link
+              to="/courses"
+              className="rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground glow"
+            >
               Start your quest →
             </Link>
             <Link to="/battle" className="rounded-xl border border-border px-6 py-3 font-semibold">
@@ -52,13 +63,23 @@ function Home() {
             </Link>
           </div>
         </div>
-        <img src={map} alt="Quest map with a glowing path to a castle" width={1280} height={896} className="rounded-2xl glow" />
+        <img
+          src={map}
+          alt="Quest map with a glowing path to a castle"
+          width={1280}
+          height={896}
+          className="rounded-2xl glow"
+        />
       </section>
 
       {/* Course icons */}
       <section className="panel mt-14 grid gap-4 p-6 sm:grid-cols-4">
         {courses.map((c) => (
-          <Link key={c.id} to="/courses" className="flex items-center gap-3 rounded-lg p-2 hover:bg-secondary">
+          <Link
+            key={c.id}
+            to="/courses"
+            className="flex items-center gap-3 rounded-lg p-2 hover:bg-secondary"
+          >
             <img src={c.icon} alt={`${c.name} logo`} width={40} height={40} className="h-10 w-10" />
             <div>
               <div className={`font-display text-lg font-bold ${c.color}`}>{c.name}</div>
@@ -74,9 +95,24 @@ function Home() {
           <p className="text-muted-foreground">A simple path to real progress.</p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {[
-              { i: BookOpen, t: "Learn",   d: "Follow bite-sized lessons designed like quests.", c: "text-primary" },
-              { i: Terminal, t: "Code",    d: "Solve challenges and build real projects.", c: "text-sky" },
-              { i: Trophy,   t: "Conquer", d: "Earn XP, unlock badges, and climb the leaderboard.", c: "text-gold" },
+              {
+                i: BookOpen,
+                t: "Learn",
+                d: "Follow bite-sized lessons designed like quests.",
+                c: "text-primary",
+              },
+              {
+                i: Terminal,
+                t: "Code",
+                d: "Solve challenges and build real projects.",
+                c: "text-sky",
+              },
+              {
+                i: Trophy,
+                t: "Conquer",
+                d: "Earn XP, unlock badges, and climb the leaderboard.",
+                c: "text-gold",
+              },
             ].map(({ i: I, t, d, c }) => (
               <div key={t} className="panel p-5">
                 <I className={`h-8 w-8 ${c}`} />
@@ -87,9 +123,9 @@ function Home() {
           </div>
           <div className="panel mt-4 grid gap-4 p-6 md:grid-cols-3">
             {[
-              { i: Star,   v: "250K+", l: "XP earned by learners", c: "text-gold" },
-              { i: Flame,  v: "32",    l: "day average streak",    c: "text-ember" },
-              { i: Shield, v: "18K+",  l: "badges unlocked",       c: "text-sky" },
+              { i: Star, v: "250K+", l: "XP earned by learners", c: "text-gold" },
+              { i: Flame, v: "32", l: "day average streak", c: "text-ember" },
+              { i: Shield, v: "18K+", l: "badges unlocked", c: "text-sky" },
             ].map(({ i: I, v, l, c }) => (
               <div key={l} className="flex items-center gap-3">
                 <I className={`h-8 w-8 ${c}`} />
@@ -106,9 +142,12 @@ function Home() {
         <div className="panel p-5">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-xl font-bold">
-              <Crown className="h-5 w-5 text-gold" />Leaderboard
+              <Crown className="h-5 w-5 text-gold" />
+              Leaderboard
             </h3>
-            <Link to="/leaderboard" className="text-sm text-primary">View all →</Link>
+            <Link to="/leaderboard" className="text-sm text-primary">
+              View all →
+            </Link>
           </div>
           {leaders.length === 0 ? (
             <div className="mt-4 space-y-3">
