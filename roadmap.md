@@ -5,3 +5,4 @@
 - [ ] Refine logo, banners, backgrounds to match screenshots
 - [ ] Sign-in + saved XP, streaks, course progress, exam results
 - [ ] AI tutor on lesson page (share code, ask questions, hints)
+- [ ] Add signed-in coding problem descriptions and actionable lesson-aware hints; verify a real request
