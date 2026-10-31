@@ -44,7 +44,7 @@ function Courses() {
         {list.map((c) => (
           <div key={c.id} className="panel flex flex-col overflow-hidden">
             <div className="relative h-36">
-              <img src={c.banner} alt="" loading="lazy" width={1088} height={608} className="h-full w-full object-cover" />
+              <img src={c.banner} alt="" loading="lazy" width={1344} height={768} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
               <img src={c.icon} alt={`${c.name} logo`} width={56} height={56} className="absolute bottom-2 left-5 h-14 w-14" />
             </div>
