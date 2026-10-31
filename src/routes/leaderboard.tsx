@@ -4,6 +4,7 @@ import { Trophy } from "lucide-react";
 import { Shell } from "@/components/site";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { avatars } from "@/lib/data";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
@@ -17,7 +18,14 @@ export const Route = createFileRoute("/leaderboard")({
   component: Board,
 });
 
-type Leader = { id: string; display_name: string; xp: number; streak: number };
+type Leader = { id: string; display_name: string; xp: number; streak: number; avatar_id?: string };
+
+const avatarMap: Record<string, string> = {
+  rogue: avatars.rogue,
+  mage: avatars.mage,
+  king: avatars.king,
+  elf: avatars.elf,
+};
 
 function rankTitle(xp: number) {
   if (xp >= 3000) return "Grand Coder";
@@ -36,7 +44,7 @@ function Board() {
   useEffect(() => {
     supabase
       .from("profiles")
-      .select("id, display_name, xp, streak")
+      .select("id, display_name, xp, streak, avatar_id")
       .order("xp", { ascending: false })
       .limit(50)
       .then(({ data }) => {
@@ -70,13 +78,15 @@ function Board() {
               <div className="mt-8 grid grid-cols-3 items-end gap-4 text-center">
                 {podium.map((p, i) => (
                   <div key={p.id}>
-                    <div
-                      className={`mx-auto mb-2 flex items-center justify-center rounded-xl border-2 font-display text-2xl font-bold ${
-                        i === 1 ? "h-24 w-24 border-gold text-gold" : "h-20 w-20 border-border"
+                    <img
+                      src={avatarMap[p.avatar_id || "rogue"] || avatars.rogue}
+                      alt=""
+                      className={`mx-auto mb-2 rounded-2xl border-2 object-cover ${
+                        i === 1
+                          ? "h-24 w-24 border-gold shadow-lg shadow-gold/20"
+                          : "h-20 w-20 border-border"
                       }`}
-                    >
-                      {p.display_name.slice(0, 2).toUpperCase()}
-                    </div>
+                    />
                     <div className={`font-bold ${p.id === user?.id ? "text-primary" : ""}`}>
                       {p.display_name}
                       {p.id === user?.id && <span className="ml-1 text-xs">(you)</span>}
@@ -116,9 +126,11 @@ function Board() {
                     <td className="p-3">{i + 1}</td>
                     <td>
                       <span className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-sm font-bold">
-                          {p.display_name.slice(0, 2).toUpperCase()}
-                        </span>
+                        <img
+                          src={avatarMap[p.avatar_id || "rogue"] || avatars.rogue}
+                          alt=""
+                          className="h-9 w-9 shrink-0 rounded-lg object-cover border border-border"
+                        />
                         {p.display_name}
                         {p.id === user?.id && <span className="text-xs text-primary">(you)</span>}
                       </span>

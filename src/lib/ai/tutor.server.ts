@@ -10,6 +10,24 @@ import {
 
 const MODEL = "openai/gpt-6-astra";
 
+// In-memory sliding window rate limiter per user id
+const requestTimestamps = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // max 10 tutor requests per minute
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const timestamps = (requestTimestamps.get(userId) || []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS,
+  );
+  if (timestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+  timestamps.push(now);
+  requestTimestamps.set(userId, timestamps);
+  return false;
+}
+
 async function verifyUser(request: Request) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return null;
@@ -34,6 +52,14 @@ export async function handleTutor(request: Request) {
   const user = await verifyUser(request);
   if (!user)
     return Response.json({ error: "Please sign in to use the AI tutor." }, { status: 401 });
+
+  if (isRateLimited(user.id)) {
+    return Response.json(
+      { error: "You're asking hints quickly! Please wait a moment before asking again." },
+      { status: 429 },
+    );
+  }
+
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return Response.json({ error: "AI tutor is not configured." }, { status: 500 });
 

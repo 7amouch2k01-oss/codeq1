@@ -2,7 +2,19 @@ import python from "@/assets/banner-python.jpg";
 import html from "@/assets/banner-html.jpg";
 import c from "@/assets/banner-c.jpg";
 import cpp from "@/assets/banner-cpp.jpg";
+import rogue from "@/assets/av-rogue.jpg";
+import mage from "@/assets/av-mage.jpg";
+import king from "@/assets/av-king.jpg";
+import elf from "@/assets/av-elf.jpg";
+
 const banners = { python, html, c, cpp };
+
+export const avatars = {
+  rogue,
+  mage,
+  king,
+  elf,
+};
 
 export const courses = [
   {

@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Star, Flame, BookOpen, Trophy, Shield, Download } from "lucide-react";
+import { Star, Flame, BookOpen, Trophy, Shield, Download, UserCheck } from "lucide-react";
 import { Shell } from "@/components/site";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { avatars } from "@/lib/data";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -21,6 +23,13 @@ export const Route = createFileRoute("/profile")({
 });
 
 type CourseProgress = { course: string; completed: number; total: number };
+
+const avatarOptions: { id: string; label: string; src: string }[] = [
+  { id: "rogue", label: "Shadow Rogue", src: avatars.rogue },
+  { id: "mage", label: "Arcane Mage", src: avatars.mage },
+  { id: "king", label: "Grand Sovereign", src: avatars.king },
+  { id: "elf", label: "Forest Ranger", src: avatars.elf },
+];
 
 const BADGE_THRESHOLDS = [
   {
@@ -69,6 +78,7 @@ const COURSE_LESSONS: Record<string, string[]> = {
     "python-3-functions",
     "python-4-loops",
     "python-5-projects",
+    "python-6-lists",
   ],
   "Web Development": ["html-1-intro", "html-2-forms", "html-3-css", "html-4-layout"],
   "C Programming": ["c-1-intro", "c-2-pointers", "c-3-structs", "c-4-memory"],
@@ -76,13 +86,14 @@ const COURSE_LESSONS: Record<string, string[]> = {
 };
 
 function Profile() {
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth();
   const [lessons, setLessons] = useState<string[]>([]);
   const [exams, setExams] = useState<
     { exam_id: string; score: number; passed: boolean; taken_at: string }[]
   >([]);
   const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -108,6 +119,24 @@ function Profile() {
     });
   }, [user]);
 
+  const selectAvatar = async (avatarId: string) => {
+    if (!user || updatingAvatar) return;
+    setUpdatingAvatar(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_id: avatarId } as any)
+        .eq("id", user.id);
+      if (error) throw error;
+      toast.success("Avatar updated!");
+      refresh();
+    } catch {
+      toast.error("Failed to update avatar.");
+    } finally {
+      setUpdatingAvatar(false);
+    }
+  };
+
   if (!user) {
     return (
       <Shell>
@@ -128,24 +157,26 @@ function Profile() {
   const xp = profile?.xp ?? 0;
   const streak = profile?.streak ?? 0;
   const level = Math.floor(xp / 100) + 1;
-  const xpToNext = 100 - (xp % 100);
+  const currentAvatarId = (profile as any)?.avatar_id || "rogue";
+  const currentAvatar = avatarOptions.find((a) => a.id === currentAvatarId) || avatarOptions[0]!;
   const passed = exams.filter((e) => e.passed);
   const earnedBadges = BADGE_THRESHOLDS.filter((b) => b.req(xp, lessons.length, streak));
-  const initials = (profile?.display_name ?? user.email ?? "??").slice(0, 2).toUpperCase();
 
   return (
     <Shell>
       {/* Hero card */}
       <div className="panel p-6">
         <div className="flex flex-wrap items-center gap-6">
-          <div className="flex h-40 w-40 items-center justify-center rounded-xl border-2 border-border bg-secondary text-5xl font-bold text-primary">
-            {initials}
-          </div>
+          <img
+            src={currentAvatar.src}
+            alt={currentAvatar.label}
+            className="h-36 w-36 rounded-2xl border-2 border-primary object-cover glow"
+          />
           <div className="flex-1 min-w-0">
             <h1 className="text-4xl font-bold">{profile?.display_name ?? "Adventurer"}</h1>
-            <p className="flex items-center gap-1 text-gold">
+            <p className="flex items-center gap-1.5 text-gold font-semibold">
               <Shield className="h-4 w-4" />
-              {rankTitle(xp)}
+              {rankTitle(xp)} · {currentAvatar.label}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
           </div>
@@ -156,6 +187,30 @@ function Profile() {
               <div className="h-2 rounded-full bg-primary" style={{ width: `${xp % 100}%` }} />
             </div>
             <p className="mt-1 text-sm text-primary">{xp % 100} / 100 XP to next level</p>
+          </div>
+        </div>
+
+        {/* Avatar Customizer */}
+        <div className="mt-6 rounded-xl border border-border p-4">
+          <p className="text-sm font-semibold flex items-center gap-2">
+            <UserCheck className="h-4 w-4 text-primary" /> Choose Your Adventurer Character:
+          </p>
+          <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {avatarOptions.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => selectAvatar(opt.id)}
+                disabled={updatingAvatar}
+                className={`flex items-center gap-3 rounded-lg border p-2 text-left transition ${
+                  opt.id === currentAvatarId
+                    ? "border-primary bg-secondary/80 ring-1 ring-primary"
+                    : "border-border hover:bg-muted"
+                }`}
+              >
+                <img src={opt.src} alt="" className="h-10 w-10 rounded-md object-cover" />
+                <span className="text-xs font-semibold">{opt.label}</span>
+              </button>
+            ))}
           </div>
         </div>
 

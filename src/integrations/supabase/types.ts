@@ -1,8 +1,6 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.18";
   };
@@ -30,6 +28,48 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      daily_battles: {
+        Row: {
+          id: string;
+          battle_date: string;
+          title: string;
+          difficulty: string;
+          description: string;
+          starter_code: string;
+          solution_check: string;
+          test_input: string;
+          expected_output: string;
+          xp_reward: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          battle_date: string;
+          title: string;
+          difficulty?: string;
+          description: string;
+          starter_code: string;
+          solution_check: string;
+          test_input: string;
+          expected_output: string;
+          xp_reward?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          battle_date?: string;
+          title?: string;
+          difficulty?: string;
+          description?: string;
+          starter_code?: string;
+          solution_check?: string;
+          test_input?: string;
+          expected_output?: string;
+          xp_reward?: number;
+          created_at?: string;
+        };
+        Relationships: [];
       };
       exam_results: {
         Row: {
@@ -78,28 +118,34 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_id: string;
           created_at: string;
           display_name: string;
           id: string;
           is_admin: boolean;
+          is_pro: boolean;
           last_active: string | null;
           streak: number;
           xp: number;
         };
         Insert: {
+          avatar_id?: string;
           created_at?: string;
           display_name?: string;
           id: string;
           is_admin?: boolean;
+          is_pro?: boolean;
           last_active?: string | null;
           streak?: number;
           xp?: number;
         };
         Update: {
+          avatar_id?: string;
           created_at?: string;
           display_name?: string;
           id?: string;
           is_admin?: boolean;
+          is_pro?: boolean;
           last_active?: string | null;
           streak?: number;
           xp?: number;
@@ -110,6 +156,7 @@ export type Database = {
     Views: {
       leaderboard: {
         Row: {
+          avatar_id: string | null;
           display_name: string | null;
           id: string | null;
           streak: number | null;
@@ -122,10 +169,12 @@ export type Database = {
       award_battle_xp: {
         Args: Record<PropertyKey, never>;
         Returns: {
+          avatar_id: string;
           created_at: string;
           display_name: string;
           id: string;
           is_admin: boolean;
+          is_pro: boolean;
           last_active: string | null;
           streak: number;
           xp: number;
@@ -134,10 +183,12 @@ export type Database = {
       award_xp: {
         Args: { _amount: number };
         Returns: {
+          avatar_id: string;
           created_at: string;
           display_name: string;
           id: string;
           is_admin: boolean;
+          is_pro: boolean;
           last_active: string | null;
           streak: number;
           xp: number;
@@ -262,10 +313,10 @@ export type CompositeTypes<
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
-> = PublicCompositeTypeNameOrOptions extends {
+> = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never;
