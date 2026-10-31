@@ -135,11 +135,15 @@ function Profile() {
         .from("profiles")
         .update({ avatar_id: avatarId } as any)
         .eq("id", user.id);
-      if (error) throw error;
+      if (error) {
+        console.error("Avatar update error:", error);
+        throw error;
+      }
       toast.success("Avatar updated!");
       refresh();
-    } catch {
-      toast.error("Failed to update avatar.");
+    } catch (err: any) {
+      console.error("Failed to update avatar:", err);
+      toast.error(err?.message || "Failed to update avatar.");
     } finally {
       setUpdatingAvatar(false);
     }

@@ -44,15 +44,19 @@ function Admin() {
   const [stats, setStats] = useState({ total: 0, completions: 0, exams: 0 });
   const [query, setQuery] = useState("");
 
-  // Auth guard: redirect non-admins immediately
+  // Auth guard: redirect non-admins immediately once auth + profile loading completes
   useEffect(() => {
     if (loading) return;
     if (!user) {
       navigate({ to: "/auth", replace: true });
       return;
     }
-    if (!(profile as any)?.is_admin) {
-      navigate({ to: "/", replace: true });
+    // Check if profile is still loading or if user is admin
+    if (profile !== null) {
+      if (!(profile as any)?.is_admin) {
+        toast.error("Access restricted: Administrator rights required.");
+        navigate({ to: "/", replace: true });
+      }
     }
   }, [user, profile, loading, navigate]);
 
