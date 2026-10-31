@@ -309,9 +309,13 @@ function Admin() {
 
   const certExamLabels: Record<string, string> = {
     python: "🐍 Python Adventurer",
+    "python-certification": "🐍 Python Adventurer",
     html: "🌐 Web Craft",
+    "html-certification": "🌐 Web Craft",
     c: "⚙️ C Systems",
+    "c-certification": "⚙️ C Systems",
     cpp: "🏗️ Modern C++",
+    "cpp-certification": "🏗️ Modern C++",
   };
 
   return (

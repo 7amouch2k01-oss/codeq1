@@ -269,7 +269,7 @@ function ExamPage() {
     try {
       const { error } = await supabase.from("exam_results").insert({
         user_id: user.id,
-        exam_id: `${currentTrack}-certification`,
+        exam_id: currentTrack,
         score,
         passed,
       });
@@ -347,6 +347,7 @@ function ExamPage() {
               <div className="mt-6 flex flex-wrap justify-center gap-4">
                 <Link
                   to="/certificate"
+                  search={{ track: currentTrack }}
                   className="rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground glow"
                 >
                   View & Download Certificate →
