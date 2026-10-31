@@ -6,6 +6,7 @@ import { runPython } from "@/lib/data";
 import { AiTutor } from "@/components/ai-tutor";
 import { useAuth, completeLesson } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { loopsLesson } from "@/lib/lesson-context";
 
 export const Route = createFileRoute("/lesson")({
   head: () => ({
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/lesson")({
       { name: "description", content: "Learn Python for loops and complete the challenge to earn 20 XP." },
       { property: "og:title", content: "Lesson 4: Loops — Questbound" },
       { property: "og:description", content: "Repeat. Build. Go further." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Lesson,
@@ -82,7 +85,7 @@ function Lesson() {
             {done && <p className="mt-2 font-semibold text-primary">✔ Quest complete! +20 XP earned.{!user && " Sign in to save it."}</p>}
           </div>
         </div>
-        <AiTutor lesson={{ title: "Python Fundamentals — Lesson 4: Loops", challenge: "Use a for loop to print the numbers 1 through 10, each on a new line." }} code={code} />
+        <AiTutor lesson={loopsLesson} code={code} output={out} error={err} />
       </div>
     </Shell>
   );
