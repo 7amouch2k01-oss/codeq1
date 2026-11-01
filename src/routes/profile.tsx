@@ -317,31 +317,47 @@ function Profile() {
             <p className="mt-3 text-sm text-muted-foreground">
               No exams taken yet —{" "}
               <Link to="/exam" className="text-primary">
-                take the Python Beginner Exam
+                take a Certification Exam
               </Link>
               .
             </p>
           ) : (
-            exams.map((c) => (
-              <div
-                key={c.taken_at}
-                className="mt-3 flex items-center justify-between border-t border-border pt-3"
-              >
-                <span>
-                  Python Beginner Exam — {c.score}% {c.passed ? "✅ Passed" : "❌ Not passed"} ·{" "}
-                  {new Date(c.taken_at).toLocaleDateString()}
-                </span>
-                {c.passed && (
-                  <Link
-                    to="/certificate"
-                    className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    View
-                  </Link>
-                )}
-              </div>
-            ))
+            exams.map((c) => {
+              const trackLabels: Record<string, { label: string; emoji: string }> = {
+                python: { label: "Python Adventurer", emoji: "🐍" },
+                html: { label: "Web Craft", emoji: "🌐" },
+                c: { label: "C Systems Engineer", emoji: "⚙️" },
+                cpp: { label: "Modern C++ Architect", emoji: "🏗️" },
+              };
+              // Support both "python" and "python-certification" exam_id formats
+              const trackKey = c.exam_id.replace("-certification", "");
+              const trackInfo = trackLabels[trackKey] || {
+                label: c.exam_id,
+                emoji: "🏅",
+              };
+              return (
+                <div
+                  key={c.exam_id + c.taken_at}
+                  className="mt-3 flex items-center justify-between border-t border-border pt-3"
+                >
+                  <span className="text-sm">
+                    {trackInfo.emoji} {trackInfo.label} Exam — {c.score}%{" "}
+                    {c.passed ? "✅ Passed" : "❌ Not passed"} ·{" "}
+                    {new Date(c.taken_at).toLocaleDateString()}
+                  </span>
+                  {c.passed && (
+                    <Link
+                      to="/certificate"
+                      search={{ track: trackKey as any }}
+                      className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted transition"
+                    >
+                      <Download className="h-4 w-4" />
+                      View Cert
+                    </Link>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </div>
