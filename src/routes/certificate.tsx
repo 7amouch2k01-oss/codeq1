@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const searchSchema = z.object({
-  track: z.enum(["python", "html", "c", "cpp"]).optional(),
+  track: z.enum(["python", "html", "c", "cpp", "sql", "dsa"]).optional(),
 });
 
 export const Route = createFileRoute("/certificate")({
@@ -55,6 +55,18 @@ const trackMeta: Record<
     label: "C++ Architect",
     emoji: "🏗️",
     examId: "cpp",
+  },
+  sql: {
+    title: "SQL & Data Engineering",
+    label: "Database Sage",
+    emoji: "🗄️",
+    examId: "sql",
+  },
+  dsa: {
+    title: "Algorithms & Data Structures",
+    label: "Algorithm Master",
+    emoji: "⚡",
+    examId: "dsa",
   },
 };
 

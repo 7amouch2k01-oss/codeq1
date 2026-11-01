@@ -50,6 +50,22 @@ export const courses = [
     blurb: "Take your skills further with modern C++. Build games, engines, and systems.",
     color: "text-sky",
   },
+  {
+    id: "sql",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+    banner: banners.python,
+    name: "SQL & Databases",
+    blurb: "Master relational schemas, queries, joins, and database analytics.",
+    color: "text-primary",
+  },
+  {
+    id: "dsa",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+    banner: banners.c,
+    name: "Algorithms & DSA",
+    blurb: "Conquer recursion, binary search, trees, and dynamic programming.",
+    color: "text-ember",
+  },
 ];
 
 export const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];

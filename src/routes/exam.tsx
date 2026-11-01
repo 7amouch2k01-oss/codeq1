@@ -9,7 +9,7 @@ import confetti from "canvas-confetti";
 import { z } from "zod";
 
 const searchSchema = z.object({
-  track: z.enum(["python", "html", "c", "cpp"]).optional(),
+  track: z.enum(["python", "html", "c", "cpp", "sql", "dsa"]).optional(),
 });
 
 export const Route = createFileRoute("/exam")({
@@ -213,6 +213,76 @@ const examRegistry: Record<
         opts: ["public", "private", "protected", "static"],
         a: 1,
         explanation: "Classes have private members by default (unlike struct, which is public).",
+      },
+    ],
+  },
+  sql: {
+    title: "SQL & Relational Databases Certification Exam",
+    track: "SQL",
+    badge: "🗄️ Certified Database Sage",
+    questions: [
+      {
+        id: 1,
+        question: "Which clause is used to filter records grouped by an aggregate function like COUNT() or AVG()?",
+        opts: ["WHERE", "HAVING", "GROUP BY", "ORDER BY"],
+        a: 1,
+        explanation: "HAVING filters groups created by GROUP BY, while WHERE filters individual rows.",
+      },
+      {
+        id: 2,
+        question: "Which JOIN returns all rows from the left table and matched rows from the right table?",
+        opts: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN"],
+        a: 1,
+        explanation: "LEFT JOIN preserves every row from the left table regardless of matches.",
+      },
+      {
+        id: 3,
+        question: "What keyword removes duplicate rows from the query output?",
+        opts: ["UNIQUE", "DISTINCT", "DIFFERENT", "SEPARATE"],
+        a: 1,
+        explanation: "SELECT DISTINCT removes duplicate rows from the result set.",
+      },
+      {
+        id: 4,
+        question: "Which command adds a new column to an existing table in SQL?",
+        opts: ["UPDATE TABLE", "ALTER TABLE", "MODIFY TABLE", "EXTEND TABLE"],
+        a: 1,
+        explanation: "ALTER TABLE table_name ADD COLUMN ... modifies the table schema.",
+      },
+    ],
+  },
+  dsa: {
+    title: "Algorithms & Data Structures Certification Exam",
+    track: "DSA",
+    badge: "⚡ Certified Algorithm Master",
+    questions: [
+      {
+        id: 1,
+        question: "What is the average time complexity of Binary Search on a sorted array of size N?",
+        opts: ["O(1)", "O(log N)", "O(N)", "O(N log N)"],
+        a: 1,
+        explanation: "Binary search divides the search space in half each iteration, yielding O(log N).",
+      },
+      {
+        id: 2,
+        question: "Which data structure follows the LIFO (Last-In, First-Out) principle?",
+        opts: ["Queue", "Stack", "Linked List", "Binary Heap"],
+        a: 1,
+        explanation: "A Stack pushes and pops items from the top (Last-In, First-Out).",
+      },
+      {
+        id: 3,
+        question: "What essential condition prevents an infinite call stack in recursion?",
+        opts: ["Loop condition", "Base case", "Type cast", "Exception handler"],
+        a: 1,
+        explanation: "A base case halts the recursion chain to prevent StackOverflowError.",
+      },
+      {
+        id: 4,
+        question: "What is the worst-case time complexity of QuickSort?",
+        opts: ["O(N log N)", "O(N^2)", "O(N)", "O(2^N)"],
+        a: 1,
+        explanation: "When poorly chosen pivots occur (e.g. sorted arrays without random pivots), QuickSort degrades to O(N^2).",
       },
     ],
   },

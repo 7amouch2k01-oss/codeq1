@@ -79,10 +79,47 @@ const COURSE_LESSONS: Record<string, string[]> = {
     "python-4-loops",
     "python-5-projects",
     "python-6-lists",
+    "python-7-dictionaries",
+    "python-8-exceptions",
+    "python-9-classes",
+    "python-10-capstone",
   ],
-  "Web Development": ["html-1-intro", "html-2-forms", "html-3-css", "html-4-layout"],
-  "C Programming": ["c-1-intro", "c-2-pointers", "c-3-structs", "c-4-memory"],
-  "C++ Programming": ["cpp-1-intro", "cpp-2-oop", "cpp-3-templates", "cpp-4-stl"],
+  "Web Development": [
+    "html-1-intro",
+    "html-2-forms",
+    "html-3-css",
+    "html-4-layout",
+    "html-5-grid",
+    "html-6-js",
+  ],
+  "C Systems Programming": [
+    "c-1-intro",
+    "c-2-pointers",
+    "c-3-structs",
+    "c-4-memory",
+    "c-5-linked-lists",
+    "c-6-bitwise",
+  ],
+  "Modern C++ Programming": [
+    "cpp-1-intro",
+    "cpp-2-oop",
+    "cpp-3-templates",
+    "cpp-4-stl",
+    "cpp-5-smart-pointers",
+    "cpp-6-game-loop",
+  ],
+  "SQL & Databases": [
+    "sql-1-select",
+    "sql-2-where",
+    "sql-3-joins",
+    "sql-4-aggregates",
+  ],
+  "Algorithms & Data Structures": [
+    "dsa-1-recursion",
+    "dsa-2-binary-search",
+    "dsa-3-stacks",
+    "dsa-4-queues",
+  ],
 };
 
 function Profile() {
@@ -328,6 +365,8 @@ function Profile() {
                 html: { label: "Web Craft", emoji: "🌐" },
                 c: { label: "C Systems Engineer", emoji: "⚙️" },
                 cpp: { label: "Modern C++ Architect", emoji: "🏗️" },
+                sql: { label: "Database Sage", emoji: "🗄️" },
+                dsa: { label: "Algorithm Master", emoji: "⚡" },
               };
               // Support both "python" and "python-certification" exam_id formats
               const trackKey = c.exam_id.replace("-certification", "");

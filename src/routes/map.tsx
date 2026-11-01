@@ -9,7 +9,7 @@ import { multiCourseRegistry, type LanguageTrack } from "@/lib/lesson-context";
 import { z } from "zod";
 
 const searchSchema = z.object({
-  track: z.enum(["python", "html", "c", "cpp"]).optional(),
+  track: z.enum(["python", "html", "c", "cpp", "sql", "dsa"]).optional(),
 });
 
 export const Route = createFileRoute("/map")({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/map")({
       { title: "Course Quest Map — Questbound" },
       {
         name: "description",
-        content: "Follow your coding quest path across Python, HTML, C, and C++.",
+        content: "Follow your coding quest path across Python, Web, C, C++, SQL, and Algorithms.",
       },
       { property: "og:title", content: "Course Quest Map — Questbound" },
       { property: "og:description", content: "Smaller steps. Bigger worlds." },
@@ -55,6 +55,18 @@ const trackMeta: Record<
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
     blurb: "Design games, high performance algorithms, and object architectures.",
     lockedCount: 4,
+  },
+  sql: {
+    name: "SQL & Data Archives",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+    blurb: "Query the ancient databases, master joins, and aggregate wisdom.",
+    lockedCount: 3,
+  },
+  dsa: {
+    name: "Algorithms & Labyrinth",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+    blurb: "Solve recursions, navigate binary searches, and master stacks.",
+    lockedCount: 3,
   },
 };
 
