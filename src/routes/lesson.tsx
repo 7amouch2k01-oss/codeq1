@@ -21,10 +21,11 @@ import { toast } from "sonner";
 import { multiCourseRegistry, type LanguageTrack, type LessonInfo } from "@/lib/lesson-context";
 import { z } from "zod";
 import confetti from "canvas-confetti";
+import { soundFx } from "@/lib/sound-fx";
 
 const searchSchema = z.object({
   id: z.string().optional(),
-  track: z.enum(["python", "html", "c", "cpp"]).optional(),
+  track: z.enum(["python", "html", "c", "cpp", "sql", "dsa"]).optional(),
 });
 
 export const Route = createFileRoute("/lesson")({
@@ -100,7 +101,7 @@ function LessonPage() {
     setAiExplanation(null);
 
     try {
-      if (selectedTrack === "python") {
+      if (selectedTrack === "python" || selectedTrack === "dsa") {
         const result = await executePythonCode(code);
         setOut(result.output);
         setErr(result.error);
@@ -109,6 +110,18 @@ function LessonPage() {
         setHtmlPreviewKey((k) => k + 1);
         setOut("Live web preview rendered successfully.");
         return { output: "Live web preview rendered.", error: "" };
+      } else if (selectedTrack === "sql") {
+        const isSelect = code.toUpperCase().includes("SELECT");
+        const hasFrom = code.toUpperCase().includes("FROM");
+        if (!isSelect || !hasFrom) {
+          const sqlErr = "SQL Error: Query requires valid SELECT and FROM clauses.";
+          setErr(sqlErr);
+          setOut("");
+          return { output: "", error: sqlErr };
+        }
+        const sqlOut = "Query executed successfully.\nReturned matching dataset rows.";
+        setOut(sqlOut);
+        return { output: sqlOut, error: "" };
       } else {
         // C & C++ structural checks & simulation
         const isHeaderValid = code.includes("#include");
@@ -134,12 +147,17 @@ function LessonPage() {
     setDone(isPassing);
 
     if (isPassing) {
+      soundFx.playSuccess();
       fireCelebrationConfetti();
       if (user) {
         completeLesson(activeLesson.id, 20)
           .then((newPoints) => {
-            if (newPoints) toast.success("+20 XP saved to your quest profile!");
-            else toast("Already completed — progress confirmed.");
+            if (newPoints) {
+              soundFx.playLevelUp();
+              toast.success("+20 XP saved to your quest profile!");
+            } else {
+              toast("Already completed — progress confirmed.");
+            }
             refresh();
           })
           .catch(() => toast.error("Could not record lesson progress."));
@@ -147,6 +165,7 @@ function LessonPage() {
         toast.success("Awesome job! Sign in to save your XP.");
       }
     } else {
+      soundFx.playError();
       setErr("Challenge requirements not met yet. Check the requirements or ask the AI mentor!");
     }
   };

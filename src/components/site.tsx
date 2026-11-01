@@ -2,12 +2,13 @@ import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png";
 import bgNight from "@/assets/bg-night.jpg";
 import type { ReactNode } from "react";
-import { Flame, LogOut, Menu, X, ShieldAlert } from "lucide-react";
+import { Flame, LogOut, Menu, X, ShieldAlert, Volume2, VolumeX } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { soundFx } from "@/lib/sound-fx";
 
 export function Logo() {
   return (
@@ -23,7 +24,16 @@ export function Logo() {
 
 export function Shell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => soundFx.isMuted());
   const { user, profile } = useAuth();
+
+  const handleToggleSound = () => {
+    const muted = soundFx.toggleMute();
+    setIsMuted(muted);
+    if (!muted) {
+      soundFx.playSuccess();
+    }
+  };
 
   // Navigation filtering:
   // Public users ONLY see Courses & Pricing
@@ -71,6 +81,19 @@ export function Shell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Audio SFX Mute/Unmute Toggle */}
+            <button
+              onClick={handleToggleSound}
+              aria-label={isMuted ? "Unmute game audio" : "Mute game audio"}
+              title={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
+              className="flex items-center justify-center h-8 w-8 rounded-lg border border-border/80 text-muted-foreground hover:text-primary hover:border-primary/50 transition bg-secondary/40"
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4 text-destructive/80" />
+              ) : (
+                <Volume2 className="h-4 w-4 text-primary" />
+              )}
+            </button>
             <UserBox />
             {/* Mobile hamburger */}
             <button

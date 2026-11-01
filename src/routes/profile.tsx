@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Star, Flame, BookOpen, Trophy, Shield, Download, UserCheck } from "lucide-react";
+import { Star, Flame, BookOpen, Trophy, Shield, Download, UserCheck, Zap, Sparkles, Brain, Clock, FlaskConical, CheckCircle2 } from "lucide-react";
 import { Shell } from "@/components/site";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { avatars } from "@/lib/data";
+import { soundFx } from "@/lib/sound-fx";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -71,6 +72,24 @@ function rankTitle(xp: number) {
   return "Syntax Scholar";
 }
 
+interface SkillPerk {
+  id: string;
+  name: string;
+  branch: "logic" | "speed" | "alchemy";
+  desc: string;
+  cost: number;
+  icon: string;
+}
+
+const RPG_SKILLS: SkillPerk[] = [
+  { id: "logic-1", name: "Keen Mind", branch: "logic", desc: "+10% XP bonus on all Python & DSA Quests.", cost: 1, icon: "🧠" },
+  { id: "logic-2", name: "Deep Focus", branch: "logic", desc: "+25% XP critical hit chance on Daily Battles.", cost: 2, icon: "⚡" },
+  { id: "speed-1", name: "Time Dilator", branch: "speed", desc: "+5 bonus minutes on all Certification Exams.", cost: 1, icon: "⏳" },
+  { id: "speed-2", name: "Frost Shield", branch: "speed", desc: "Permanently grants 1 extra active Streak Freeze.", cost: 2, icon: "🛡️" },
+  { id: "alchemy-1", name: "Mana Well", branch: "alchemy", desc: "Boosts starting Mana pool from 100 to 150.", cost: 1, icon: "🧪" },
+  { id: "alchemy-2", name: "Socratic Insight", branch: "alchemy", desc: "AI Mentor provides enhanced conceptual blueprints.", cost: 2, icon: "🔮" },
+];
+
 const COURSE_LESSONS: Record<string, string[]> = {
   "Python Fundamentals": [
     "python-1-variables",
@@ -132,6 +151,16 @@ function Profile() {
   const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [updatingAvatar, setUpdatingAvatar] = useState(false);
+  const [unlockedPerks, setUnlockedPerks] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return JSON.parse(localStorage.getItem("qb_unlocked_perks") || "[\"logic-1\"]");
+      } catch {
+        return ["logic-1"];
+      }
+    }
+    return ["logic-1"];
+  });
 
   // Redirect guests to /auth
   useEffect(() => {
@@ -184,6 +213,24 @@ function Profile() {
     } finally {
       setUpdatingAvatar(false);
     }
+  };
+
+  const handleUnlockPerk = (perk: SkillPerk) => {
+    if (unlockedPerks.includes(perk.id)) return;
+    const availablePoints = Math.max(0, Math.floor((profile?.xp ?? 0) / 100) + 1 - unlockedPerks.length);
+    if (availablePoints < perk.cost) {
+      soundFx.playError();
+      toast.error(`Requires ${perk.cost} Skill Points! Gain more XP to level up.`);
+      return;
+    }
+
+    soundFx.playLevelUp();
+    const nextPerks = [...unlockedPerks, perk.id];
+    setUnlockedPerks(nextPerks);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("qb_unlocked_perks", JSON.stringify(nextPerks));
+    }
+    toast.success(`✨ Unlocked Perk: ${perk.name}!`);
   };
 
   if (!user) {
@@ -282,6 +329,74 @@ function Profile() {
               </div>
             );
           })}
+        </div>
+
+        {/* Interactive RPG Constellation Skill Tree */}
+        <div className="mt-6 rounded-2xl border border-border/80 bg-secondary/20 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-bold">RPG Adventurer Skill Tree</h2>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Invest your Skill Points to unlock passive boosts, speed dilators, and alchemical perks.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="rounded-xl border border-primary/40 bg-primary/10 px-3 py-1.5 font-mono text-xs text-primary font-bold">
+                Available SP: {Math.max(0, level - unlockedPerks.length)}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {RPG_SKILLS.map((perk) => {
+              const isUnlocked = unlockedPerks.includes(perk.id);
+              return (
+                <div
+                  key={perk.id}
+                  className={`relative flex flex-col justify-between rounded-xl border p-4 transition-all ${
+                    isUnlocked
+                      ? "border-primary/60 bg-primary/10 glow"
+                      : "border-border/60 bg-card hover:border-border"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl" role="img" aria-label={perk.name}>{perk.icon}</span>
+                      <span className={`text-[0.65rem] font-bold uppercase rounded-md px-2 py-0.5 ${
+                        perk.branch === "logic" ? "bg-sky-500/20 text-sky" :
+                        perk.branch === "speed" ? "bg-amber-500/20 text-gold" :
+                        "bg-purple-500/20 text-purple-400"
+                      }`}>
+                        {perk.branch}
+                      </span>
+                    </div>
+                    <h3 className="mt-2.5 font-bold text-sm flex items-center gap-1.5">
+                      {perk.name}
+                      {isUnlocked && <CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{perk.desc}</p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
+                    <span className="font-mono text-xs text-muted-foreground">Cost: {perk.cost} SP</span>
+                    {isUnlocked ? (
+                      <span className="text-xs font-bold text-primary">Active</span>
+                    ) : (
+                      <button
+                        onClick={() => handleUnlockPerk(perk)}
+                        className="rounded-lg bg-primary/20 hover:bg-primary px-3 py-1 text-xs font-semibold text-primary hover:text-primary-foreground transition"
+                      >
+                        Unlock Perk
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Badges + Progress */}
